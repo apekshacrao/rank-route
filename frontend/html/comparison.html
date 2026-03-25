@@ -1,27 +1,53 @@
-<!-- compares different rank -->
- adaaaaa<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-
-<title>College Comparison</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<link rel="stylesheet" href="css/style.css">
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
+<div class="app-shell">
+	<aside class="app-sidebar">
+		<div class="brand-wrap">
+			<div class="brand-icon"><i class="bi bi-graph-up-arrow"></i></div>
+			<div>
+				<div class="brand-title">RANK ROUTE</div>
+				<div class="brand-subtitle">AI College Predictor</div>
+			</div>
+		</div>
 
-<div class="container mt-5">
+		<nav class="sidebar-nav">
+			<a class="nav-item" href="/html/dashboard.html"><i class="bi bi-house-door"></i>Dashboard</a>
+			<a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Rank Predictor</a>
+			<a class="nav-item" href="/html/crashcourse.html"><i class="bi bi-play-circle"></i>Crash Course</a>
+			<a class="nav-item" href="/html/mocktest.html"><i class="bi bi-journal-check"></i>Mock Test</a>
+			<a class="nav-item active" href="/html/comparison.html"><i class="bi bi-mortarboard"></i>Results</a>
+			<a class="nav-item" href="/html/analytics.html"><i class="bi bi-bar-chart"></i>Analytics</a>
+		</nav>
 
-<h2>College Comparison</h2>
+		<div class="sidebar-footer">
+			<a class="nav-item" href="/html/login.html"><i class="bi bi-box-arrow-right"></i>Sign Out</a>
+		</div>
+	</aside>
 
-<canvas id="compareChart"></canvas>
+	<main class="content-area">
+		<div class="page-toolbar">
+			<button class="sidebar-toggle" type="button" aria-label="Open menu"><i class="bi bi-list"></i></button>
+		</div>
+		<h1 class="page-title">Results</h1>
+		<p class="page-subtitle">Compare top colleges by average package trends.</p>
 
+		<section class="panel-card chart-wrap">
+			<canvas id="compareChart"></canvas>
+		</section>
+	</main>
 </div>
 
-<script src="js/script.js"></script>
-
+<script src="/js/script.js"></script>
 </body>
 </html>

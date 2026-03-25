@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock Test</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+<div class="app-shell">
+	<aside class="app-sidebar">
+		<div class="brand-wrap">
+			<div class="brand-icon"><i class="bi bi-graph-up-arrow"></i></div>
+			<div>
+				<div class="brand-title">RANK ROUTE</div>
+				<div class="brand-subtitle">AI College Predictor</div>
+			</div>
+		</div>
+
+		<nav class="sidebar-nav">
+			<a class="nav-item" href="/html/dashboard.html"><i class="bi bi-house-door"></i>Dashboard</a>
+			<a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Rank Predictor</a>
+			<a class="nav-item" href="/html/crashcourse.html"><i class="bi bi-play-circle"></i>Crash Course</a>
+			<a class="nav-item active" href="/html/mocktest.html"><i class="bi bi-journal-check"></i>Mock Test</a>
+			<a class="nav-item" href="/html/comparison.html"><i class="bi bi-mortarboard"></i>Results</a>
+			<a class="nav-item" href="/html/analytics.html"><i class="bi bi-bar-chart"></i>Analytics</a>
+		</nav>
+
+		<div class="sidebar-footer">
+			<a class="nav-item" href="/html/login.html"><i class="bi bi-box-arrow-right"></i>Sign Out</a>
+		</div>
+	</aside>
+
+	<main class="content-area">
+		<div class="page-toolbar">
+			<button class="sidebar-toggle" type="button" aria-label="Open menu"><i class="bi bi-list"></i></button>
+		</div>
+		<h1 class="page-title">KCET Mock Test</h1>
+		<p class="page-subtitle">AI-simulated practice based on previous KCET trends with timed scoring.</p>
+
+		<section class="panel-card mb-4">
+			<div class="mock-topbar">
+				<div>
+					<div id="mockSetLabel" class="mock-set-label">Ready to start: random set from 10 mock tests</div>
+					<div class="section-note">Each test has 10 MCQs and a strict 10-minute timer.</div>
+				</div>
+				<div id="timerDisplay" class="timer-chip">10:00</div>
+			</div>
+			<div class="d-flex gap-2 mt-3">
+				<button id="startMockBtn" type="button" class="btn btn-primary">Start Mock Test</button>
+				<button id="submitMockBtn" type="button" class="btn btn-outline-danger" disabled>Submit Test</button>
+			</div>
+		</section>
+
+		<section id="mockQuestionCard" class="panel-card mb-4 hidden">
+			<div class="question-meta">
+				<span id="questionCounter" class="counter-chip">Question 1 / 10</span>
+				<span id="questionTag" class="tag-chip">Physics</span>
+			</div>
+			<h3 id="questionText" class="question-title"></h3>
+			<div id="optionList" class="option-list"></div>
+			<div class="d-flex justify-content-between mt-3">
+				<button id="prevQuestionBtn" type="button" class="btn btn-outline-secondary" disabled>Previous</button>
+				<button id="nextQuestionBtn" type="button" class="btn btn-outline-primary">Next</button>
+			</div>
+		</section>
+
+		<section id="mockResultCard" class="panel-card hidden">
+			<h2 class="section-heading"><i class="bi bi-award"></i>Mock Test Result</h2>
+			<div class="result-grid">
+				<div class="result-stat">
+					<div class="result-label">Score</div>
+					<div id="resultScore" class="result-value">0 / 10</div>
+				</div>
+				<div class="result-stat">
+					<div class="result-label">Correct</div>
+					<div id="resultCorrect" class="result-value text-success">0</div>
+				</div>
+				<div class="result-stat">
+					<div class="result-label">Wrong</div>
+					<div id="resultWrong" class="result-value text-danger">0</div>
+				</div>
+				<div class="result-stat">
+					<div class="result-label">Percentage</div>
+					<div id="resultPercentage" class="result-value">0%</div>
+				</div>
+			</div>
+		</section>
+	</main>
+</div>
+
+<script src="/js/script.js"></script>
+<script src="/js/mocktest.js"></script>
+</body>
+</html>

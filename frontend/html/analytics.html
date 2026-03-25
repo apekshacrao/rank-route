@@ -1,27 +1,104 @@
-<!-- analyses the rank -->
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-
-<title>Cutoff Analytics</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analytics</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<link rel="stylesheet" href="css/style.css">
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
+<div class="app-shell">
+	<aside class="app-sidebar">
+		<div class="brand-wrap">
+			<div class="brand-icon"><i class="bi bi-graph-up-arrow"></i></div>
+			<div>
+				<div class="brand-title">RANK ROUTE</div>
+				<div class="brand-subtitle">AI College Predictor</div>
+			</div>
+		</div>
 
-<div class="container mt-5">
+		<nav class="sidebar-nav">
+			<a class="nav-item" href="/html/dashboard.html"><i class="bi bi-house-door"></i>Dashboard</a>
+			<a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Rank Predictor</a>
+			<a class="nav-item" href="/html/crashcourse.html"><i class="bi bi-play-circle"></i>Crash Course</a>
+			<a class="nav-item" href="/html/mocktest.html"><i class="bi bi-journal-check"></i>Mock Test</a>
+			<a class="nav-item" href="/html/comparison.html"><i class="bi bi-mortarboard"></i>Results</a>
+			<a class="nav-item active" href="/html/analytics.html"><i class="bi bi-bar-chart"></i>Analytics</a>
+		</nav>
 
-<h2>KCET Cutoff Trend</h2>
+		<div class="sidebar-footer">
+			<a class="nav-item" href="/html/login.html"><i class="bi bi-box-arrow-right"></i>Sign Out</a>
+		</div>
+	</aside>
 
-<canvas id="cutoffChart"></canvas>
+	<main class="content-area">
+		<div class="page-toolbar">
+			<button class="sidebar-toggle" type="button" aria-label="Open menu"><i class="bi bi-list"></i></button>
+		</div>
+		<h1 class="page-title">Analytics</h1>
+		<p class="page-subtitle">Cutoff trends, subject performance, and targeted improvement insights.</p>
 
+		<section class="panel-card mb-4">
+			<h2 class="section-heading"><i class="bi bi-clipboard-data"></i>Subject Analysis</h2>
+			<p class="section-note">Enter subject-wise performance percentages to identify weak areas and priority actions.</p>
+			<div class="subject-form-grid">
+				<label class="subject-input-card" for="scoreMaths">
+					<span>Mathematics</span>
+					<input id="scoreMaths" type="number" min="0" max="100" value="72">
+				</label>
+				<label class="subject-input-card" for="scorePhysics">
+					<span>Physics</span>
+					<input id="scorePhysics" type="number" min="0" max="100" value="66">
+				</label>
+				<label class="subject-input-card" for="scoreChemistry">
+					<span>Chemistry</span>
+					<input id="scoreChemistry" type="number" min="0" max="100" value="78">
+				</label>
+				<label class="subject-input-card" for="scoreBiology">
+					<span>Biology</span>
+					<input id="scoreBiology" type="number" min="0" max="100" value="58">
+				</label>
+			</div>
+			<div class="d-flex gap-2 mt-3">
+				<button id="analyzePerformanceBtn" type="button" class="btn btn-primary">Analyze Performance</button>
+				<button id="resetPerformanceBtn" type="button" class="btn btn-outline-secondary">Reset Defaults</button>
+			</div>
+		</section>
+
+		<section class="subject-analysis-grid mb-4">
+			<article class="panel-card chart-wrap">
+				<h3 class="section-heading"><i class="bi bi-bar-chart"></i>Subject Score Chart</h3>
+				<canvas id="subjectScoreChart"></canvas>
+			</article>
+			<article class="panel-card chart-wrap">
+				<h3 class="section-heading"><i class="bi bi-bullseye"></i>Improvement Gap</h3>
+				<p class="section-note">Gap from target score (85%) by subject.</p>
+				<canvas id="subjectGapChart"></canvas>
+			</article>
+		</section>
+
+		<section class="subject-analysis-grid mb-4">
+			<article class="panel-card">
+				<h3 class="section-heading"><i class="bi bi-trophy"></i>Subject Leaderboard</h3>
+				<div id="subjectLeaderboard" class="leaderboard-list"></div>
+			</article>
+			<article class="panel-card">
+				<h3 class="section-heading"><i class="bi bi-lightbulb"></i>Where to Improve</h3>
+				<div id="improvementInsights" class="insight-list"></div>
+			</article>
+		</section>
+
+		<section class="panel-card chart-wrap">
+			<h2 class="section-heading"><i class="bi bi-graph-up"></i>Cutoff Trend Chart</h2>
+			<canvas id="cutoffChart"></canvas>
+		</section>
+	</main>
 </div>
 
-<script src="js/script.js"></script>
-
+<script src="/js/script.js"></script>
 </body>
 </html>

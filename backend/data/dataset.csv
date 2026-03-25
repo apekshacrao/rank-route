@@ -1,0 +1,87 @@
+rank,category,branch,college
+850,GM,CSE,RV College of Engineering
+1200,GM,CSE,RV College of Engineering
+1800,GM,CSE,PES University
+2500,GM,CSE,PES University
+3200,GM,CSE,BMS College of Engineering
+4100,GM,CSE,BMS College of Engineering
+5200,GM,CSE,MS Ramaiah Institute of Technology
+6200,GM,CSE,MS Ramaiah Institute of Technology
+7600,GM,CSE,Dayananda Sagar College of Engineering
+9000,GM,CSE,Dayananda Sagar College of Engineering
+1100,OBC,CSE,RV College of Engineering
+1800,OBC,CSE,PES University
+2900,OBC,CSE,PES University
+3700,OBC,CSE,BMS College of Engineering
+4600,OBC,CSE,MS Ramaiah Institute of Technology
+6200,OBC,CSE,MS Ramaiah Institute of Technology
+7800,OBC,CSE,Dayananda Sagar College of Engineering
+9400,OBC,CSE,Dayananda Sagar College of Engineering
+1900,SC/ST,CSE,PES University
+2800,SC/ST,CSE,PES University
+3900,SC/ST,CSE,BMS College of Engineering
+5100,SC/ST,CSE,MS Ramaiah Institute of Technology
+6800,SC/ST,CSE,MS Ramaiah Institute of Technology
+8400,SC/ST,CSE,Dayananda Sagar College of Engineering
+9800,SC/ST,CSE,Dayananda Sagar College of Engineering
+1300,GM,ISE,RV College of Engineering
+2000,GM,ISE,PES University
+2900,GM,ISE,PES University
+3600,GM,ISE,BMS College of Engineering
+4500,GM,ISE,MS Ramaiah Institute of Technology
+5600,GM,ISE,MS Ramaiah Institute of Technology
+7100,GM,ISE,Dayananda Sagar College of Engineering
+8600,GM,ISE,Dayananda Sagar College of Engineering
+1500,OBC,ISE,RV College of Engineering
+2400,OBC,ISE,PES University
+3300,OBC,ISE,BMS College of Engineering
+4300,OBC,ISE,BMS College of Engineering
+5400,OBC,ISE,MS Ramaiah Institute of Technology
+6900,OBC,ISE,MS Ramaiah Institute of Technology
+8100,OBC,ISE,Dayananda Sagar College of Engineering
+9600,OBC,ISE,Dayananda Sagar College of Engineering
+2300,SC/ST,ISE,PES University
+3200,SC/ST,ISE,BMS College of Engineering
+4400,SC/ST,ISE,MS Ramaiah Institute of Technology
+5700,SC/ST,ISE,MS Ramaiah Institute of Technology
+7300,SC/ST,ISE,Dayananda Sagar College of Engineering
+8900,SC/ST,ISE,Dayananda Sagar College of Engineering
+1700,GM,ECE,RV College of Engineering
+2400,GM,ECE,PES University
+3300,GM,ECE,BMS College of Engineering
+4200,GM,ECE,BMS College of Engineering
+5300,GM,ECE,MS Ramaiah Institute of Technology
+6700,GM,ECE,MS Ramaiah Institute of Technology
+8300,GM,ECE,Dayananda Sagar College of Engineering
+9800,GM,ECE,Dayananda Sagar College of Engineering
+2000,OBC,ECE,PES University
+2800,OBC,ECE,PES University
+3700,OBC,ECE,BMS College of Engineering
+4900,OBC,ECE,MS Ramaiah Institute of Technology
+6200,OBC,ECE,MS Ramaiah Institute of Technology
+7900,OBC,ECE,Dayananda Sagar College of Engineering
+9400,OBC,ECE,Dayananda Sagar College of Engineering
+2600,SC/ST,ECE,PES University
+3500,SC/ST,ECE,BMS College of Engineering
+4700,SC/ST,ECE,MS Ramaiah Institute of Technology
+6100,SC/ST,ECE,MS Ramaiah Institute of Technology
+7700,SC/ST,ECE,Dayananda Sagar College of Engineering
+9200,SC/ST,ECE,Dayananda Sagar College of Engineering
+2000,GM,AIML,PES University
+2900,GM,AIML,BMS College of Engineering
+3900,GM,AIML,BMS College of Engineering
+5000,GM,AIML,MS Ramaiah Institute of Technology
+6300,GM,AIML,MS Ramaiah Institute of Technology
+7800,GM,AIML,Dayananda Sagar College of Engineering
+9200,GM,AIML,Dayananda Sagar College of Engineering
+2300,OBC,AIML,PES University
+3200,OBC,AIML,BMS College of Engineering
+4300,OBC,AIML,MS Ramaiah Institute of Technology
+5600,OBC,AIML,MS Ramaiah Institute of Technology
+7300,OBC,AIML,Dayananda Sagar College of Engineering
+8800,OBC,AIML,Dayananda Sagar College of Engineering
+2900,SC/ST,AIML,BMS College of Engineering
+4100,SC/ST,AIML,MS Ramaiah Institute of Technology
+5400,SC/ST,AIML,MS Ramaiah Institute of Technology
+7000,SC/ST,AIML,Dayananda Sagar College of Engineering
+8600,SC/ST,AIML,Dayananda Sagar College of Engineering

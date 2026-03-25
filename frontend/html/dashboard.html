@@ -1,69 +1,86 @@
-<!-- displays the main dashboard -->
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="css/style.css">
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
+<div class="app-shell">
+	<aside class="app-sidebar">
+		<div class="brand-wrap">
+			<div class="brand-icon"><i class="bi bi-graph-up-arrow"></i></div>
+			<div>
+				<div class="brand-title">RANK ROUTE</div>
+				<div class="brand-subtitle">AI College Predictor</div>
+			</div>
+		</div>
 
-<div class="d-flex">
+		<nav class="sidebar-nav">
+			<a class="nav-item active" href="/html/dashboard.html"><i class="bi bi-house-door"></i>Dashboard</a>
+			<a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Rank Predictor</a>
+			<a class="nav-item" href="/html/crashcourse.html"><i class="bi bi-play-circle"></i>Crash Course</a>
+			<a class="nav-item" href="/html/mocktest.html"><i class="bi bi-journal-check"></i>Mock Test</a>
+			<a class="nav-item" href="/html/comparison.html"><i class="bi bi-mortarboard"></i>Results</a>
+			<a class="nav-item" href="/html/analytics.html"><i class="bi bi-bar-chart"></i>Analytics</a>
+		</nav>
 
-<div class="sidebar bg-dark text-white p-3">
+		<div class="sidebar-footer">
+			<a class="nav-item" href="/html/login.html"><i class="bi bi-box-arrow-right"></i>Sign Out</a>
+		</div>
+	</aside>
 
-<h4>KCET AI</h4>
+	<main class="content-area">
+		<div class="page-toolbar">
+			<button class="sidebar-toggle" type="button" aria-label="Open menu"><i class="bi bi-list"></i></button>
+		</div>
+		<h1 class="page-title" id="dashboardWelcome">Welcome Student</h1>
+		<p class="page-subtitle">Your personalized counseling dashboard.</p>
 
-<a href="dashboard.html">Dashboard</a>
-<a href="predictor.html">Predictor</a>
-<a href="comparison.html">Comparison</a>
-<a href="analytics.html">Analytics</a>
+		<section class="dashboard-phrases" aria-label="Guidance highlights">
+			<article class="phrase-card">
+				<p class="phrase-tag">AI Guidance</p>
+				<h2>Predict smarter, apply with confidence.</h2>
+				<p>Use your KCET rank, category, and branch preference to get realistic college options.</p>
+			</article>
+			<article class="phrase-card">
+				<p class="phrase-tag">Performance Growth</p>
+				<h2>Small score gains can unlock bigger opportunities.</h2>
+				<p>Track subject-wise trends and focus where your improvement potential is highest.</p>
+			</article>
+			<article class="phrase-card">
+				<p class="phrase-tag">Decision Ready</p>
+				<h2>Turn data into your admission strategy.</h2>
+				<p>Compare outcomes, review cutoff trends, and plan your next move with clarity.</p>
+			</article>
+		</section>
 
+		<section class="stats-grid">
+			<article class="stat-item">
+				<div class="stat-label">Total Colleges Tracked</div>
+				<p class="stat-value">210</p>
+			</article>
+			<article class="stat-item">
+				<div class="stat-label">Top Prediction</div>
+				<p class="stat-value">RVCE</p>
+			</article>
+			<article class="stat-item">
+				<div class="stat-label">Admission Chance</div>
+				<p class="stat-value text-success">High</p>
+			</article>
+			<article class="stat-item">
+				<div class="stat-label">Placement Insight</div>
+				<p class="stat-value">12 LPA</p>
+			</article>
+		</section>
+	</main>
 </div>
 
-<div class="content p-4">
-
-<h2>Welcome Student 👋</h2>
-
-<div class="row mt-4">
-
-<div class="col-md-3">
-<div class="card p-3 shadow">
-<h5>Total Colleges</h5>
-<h3>210</h3>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card p-3 shadow">
-<h5>Top Prediction</h5>
-<h3>RVCE</h3>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card p-3 shadow">
-<h5>Admission Chance</h5>
-<h3 class="text-success">High</h3>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card p-3 shadow">
-<h5>Placement Insight</h5>
-<h3>₹12 LPA</h3>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+<script src="/js/script.js"></script>
 </body>
 </html>

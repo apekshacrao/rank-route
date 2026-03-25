@@ -1,0 +1,98 @@
+{
+  "physics": [
+    {
+      "question": "A particle moves with constant acceleration. Which graph is always a straight line?",
+      "options": ["velocity-time", "distance-time", "acceleration-time and velocity-time", "kinetic energy-time"],
+      "correct_answer": "velocity-time",
+      "explanation": "For constant acceleration, velocity varies linearly with time, so v-t is a straight line."
+    },
+    {
+      "question": "In a series LCR circuit at resonance, impedance is:",
+      "options": ["maximum", "minimum", "zero", "infinite"],
+      "correct_answer": "minimum",
+      "explanation": "At resonance in series LCR, inductive and capacitive reactances cancel, leaving only resistance."
+    },
+    {
+      "question": "The dimensional formula of Planck's constant is:",
+      "options": ["ML2T-1", "MLT-2", "ML2T-2", "M0L0T0"],
+      "correct_answer": "ML2T-1",
+      "explanation": "Planck constant has dimensions of action, i.e., energy multiplied by time."
+    },
+    {
+      "question": "For a convex lens, focal length is:",
+      "options": ["positive", "negative", "zero", "infinite"],
+      "correct_answer": "positive",
+      "explanation": "By Cartesian sign convention, focal length of a convex lens is positive."
+    },
+    {
+      "question": "The SI unit of magnetic flux is:",
+      "options": ["tesla", "weber", "henry", "ampere"],
+      "correct_answer": "weber",
+      "explanation": "Magnetic flux is measured in weber (Wb)."
+    }
+  ],
+  "chemistry": [
+    {
+      "question": "The hybridization of carbon in methane is:",
+      "options": ["sp", "sp2", "sp3", "dsp2"],
+      "correct_answer": "sp3",
+      "explanation": "Methane has tetrahedral geometry with sp3 hybridized carbon."
+    },
+    {
+      "question": "pH of a neutral solution at 25C is:",
+      "options": ["0", "7", "10", "14"],
+      "correct_answer": "7",
+      "explanation": "Neutral water at 25C has equal H+ and OH- concentrations, giving pH 7."
+    },
+    {
+      "question": "The catalyst used in Haber process is:",
+      "options": ["Ni", "Fe", "Pt", "V2O5"],
+      "correct_answer": "Fe",
+      "explanation": "Iron catalyst with promoters is used for ammonia synthesis in Haber process."
+    },
+    {
+      "question": "The oxidation state of sulfur in H2SO4 is:",
+      "options": ["+4", "+6", "+2", "0"],
+      "correct_answer": "+6",
+      "explanation": "In H2SO4, sulfur has oxidation state +6."
+    },
+    {
+      "question": "Among these, strongest acid is:",
+      "options": ["HCl", "CH3COOH", "H2CO3", "HF"],
+      "correct_answer": "HCl",
+      "explanation": "HCl is a strong acid and dissociates almost completely in water."
+    }
+  ],
+  "maths": [
+    {
+      "question": "Derivative of sin(x) is:",
+      "options": ["cos(x)", "-cos(x)", "sin(x)", "-sin(x)"],
+      "correct_answer": "cos(x)",
+      "explanation": "By standard differentiation rule, d/dx[sin(x)] = cos(x)."
+    },
+    {
+      "question": "If A is a 2x2 matrix with det(A)=0, then A is:",
+      "options": ["invertible", "singular", "orthogonal", "identity"],
+      "correct_answer": "singular",
+      "explanation": "A matrix with zero determinant is singular and non-invertible."
+    },
+    {
+      "question": "Integral of 1/x dx is:",
+      "options": ["x", "ln|x| + C", "1/(x^2)", "e^x"],
+      "correct_answer": "ln|x| + C",
+      "explanation": "The antiderivative of 1/x is natural logarithm of absolute x."
+    },
+    {
+      "question": "Number of permutations of 5 distinct objects is:",
+      "options": ["25", "60", "120", "720"],
+      "correct_answer": "120",
+      "explanation": "Permutations of 5 distinct objects equals 5! = 120."
+    },
+    {
+      "question": "If vectors are perpendicular, their dot product is:",
+      "options": ["1", "-1", "0", "depends on magnitude"],
+      "correct_answer": "0",
+      "explanation": "For perpendicular vectors, cosine of angle 90 degrees is zero, so dot product is zero."
+    }
+  ]
+}
