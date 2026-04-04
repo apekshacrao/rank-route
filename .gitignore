@@ -1,0 +1,64 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.venv*/
+venv*/
+
+# Environment and secrets
+.env
+.env.*
+*.env
+config.json
+secrets.json
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs and runtime files
+*.log
+logs/
+instance/
+*.pid
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
+
+# Python tooling/build outputs
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+share/python-wheels/
+
+# OS junk
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Optional large dataset ignores (uncomment when needed)
+# backend/data/*.csv
+# backend/data/*.json
+
+# Local scratch artifacts
+frame_ref.png

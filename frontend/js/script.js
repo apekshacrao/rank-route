@@ -7,7 +7,7 @@ let subjectGapChartInstance = null;
 let cutoffChartInstance = null;
 
 function getSmoothChartAnimationOptions() {
-	return {
+ 	return {
 		animation: {
 			duration: 1300,
 			easing: "easeOutCubic",
@@ -300,19 +300,28 @@ async function renderCutoffChart() {
 		return;
 	}
 
+	if (typeof Chart === "undefined") {
+		return;
+	}
+
 	const labels = data.years || [];
+	const chartContext = canvas.getContext("2d");
+	const lineColors = ["#0d6efd", "#198754", "#dc3545", "#fd7e14"];
+	const fillColors = ["rgba(13, 110, 253, 0.16)", "rgba(25, 135, 84, 0.16)", "rgba(220, 53, 69, 0.16)", "rgba(253, 126, 20, 0.16)"];
 	const datasets = (data.trends || []).slice(0, 4).map((trend, index) => {
-		const colors = ["#0d6efd", "#198754", "#dc3545", "#fd7e14"];
 		return {
 			label: `${trend.college_name} (${trend.branch})`,
 			data: trend.cutoffs,
-			borderColor: colors[index % colors.length],
-			pointBackgroundColor: colors[index % colors.length],
-			pointRadius: 3,
-			pointHoverRadius: 5,
-			borderWidth: 3,
-			fill: false,
-			tension: 0.35,
+			borderColor: lineColors[index % lineColors.length],
+			backgroundColor: fillColors[index % fillColors.length],
+			pointBackgroundColor: lineColors[index % lineColors.length],
+			pointBorderColor: "#ffffff",
+			pointBorderWidth: 2,
+			pointRadius: 4,
+			pointHoverRadius: 7,
+			borderWidth: 3.5,
+			fill: true,
+			tension: 0.42,
 		};
 	});
 
@@ -326,38 +335,66 @@ async function renderCutoffChart() {
 		options: {
 			...getSmoothChartAnimationOptions(),
 			animation: {
-				duration: 1700,
+				duration: 2000,
 				easing: "easeOutQuart",
 			},
 			animations: {
 				x: {
-					duration: 1100,
+					duration: 1200,
 					easing: "easeOutCubic",
 					from: 0,
 					delay: (ctx) => {
 						if (ctx.type === "data") {
-							return ctx.dataIndex * 120;
+							return ctx.dataIndex * 130;
 						}
 						return 0;
 					},
 				},
 				y: {
-					duration: 1300,
+					duration: 1500,
 					easing: "easeOutQuart",
 					from: 0,
 					delay: (ctx) => {
 						if (ctx.type === "data") {
-							return ctx.dataIndex * 120;
+							return ctx.dataIndex * 130;
 						}
 						return 0;
 					},
 				},
 			},
 			responsive: true,
-			plugins: { legend: { position: "bottom" } },
+			plugins: {
+				legend: {
+					position: "bottom",
+					labels: {
+						usePointStyle: true,
+						boxWidth: 10,
+						padding: 18,
+					},
+				},
+				title: {
+					display: false,
+				},
+				tooltip: {
+					backgroundColor: "rgba(18, 28, 55, 0.94)",
+					padding: 12,
+					usePointStyle: true,
+				},
+			},
 			scales: {
 				y: {
 					beginAtZero: true,
+					grid: { color: "rgba(17, 27, 54, 0.08)" },
+					ticks: { color: "#62708f" },
+				},
+				x: {
+					grid: { color: "rgba(17, 27, 54, 0.06)" },
+					ticks: { color: "#62708f" },
+				},
+			},
+			elements: {
+				line: {
+					borderJoinStyle: "round",
 				},
 			},
 		},

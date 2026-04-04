@@ -78,9 +78,26 @@
 				<p class="stat-value">12 LPA</p>
 			</article>
 		</section>
+
+		<section class="panel-card dashboard-chart-card mt-4">
+			<div class="dashboard-chart-header">
+				<div>
+					<h2 class="section-heading mb-2"><i class="bi bi-graph-up"></i>Cutoff Trend Chart</h2>
+					<p class="section-note mb-0">A quick view of year-wise KCET cutoff movement across top branches.</p>
+				</div>
+				<div class="chart-badges">
+					<span class="status-pill">2021 - 2024</span>
+					<span class="status-pill subtle">Animated trend view</span>
+				</div>
+			</div>
+			<div class="dashboard-chart-shell mt-3">
+				<canvas id="cutoffChart"></canvas>
+			</div>
+		</section>
 	</main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/js/script.js"></script>
 </body>
 </html>

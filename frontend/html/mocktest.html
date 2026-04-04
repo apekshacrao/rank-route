@@ -7,6 +7,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="/css/style.css">
 </head>
 
@@ -39,55 +40,213 @@
 		<div class="page-toolbar">
 			<button class="sidebar-toggle" type="button" aria-label="Open menu"><i class="bi bi-list"></i></button>
 		</div>
+
 		<h1 class="page-title">KCET Mock Test</h1>
-		<p class="page-subtitle">AI-simulated practice based on previous KCET trends with timed scoring.</p>
+		<p class="page-subtitle">Choose a difficulty, generate three AI-backed quizzes, and review every mistake after submission.</p>
 
-		<section class="panel-card mb-4">
-			<div class="mock-topbar">
+		<section id="difficultyPanel" class="panel-card mb-4">
+			<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
 				<div>
-					<div id="mockSetLabel" class="mock-set-label">Ready to start: random set from 10 mock tests</div>
-					<div class="section-note">Each test has 10 MCQs and a strict 10-minute timer.</div>
+					<h2 class="section-heading"><i class="bi bi-sliders"></i>Choose Difficulty</h2>
+					<p class="section-note mb-0">Each selection creates three randomized quizzes with Physics, Chemistry, and Math mixed in.</p>
 				</div>
-				<div id="timerDisplay" class="timer-chip">10:00</div>
+				<div id="quizGenerationStatus" class="status-pill">Ready to generate</div>
 			</div>
-			<div class="d-flex gap-2 mt-3">
-				<button id="startMockBtn" type="button" class="btn btn-primary">Start Mock Test</button>
-				<button id="submitMockBtn" type="button" class="btn btn-outline-danger" disabled>Submit Test</button>
+
+			<div id="difficultyCards" class="difficulty-grid mt-3">
+				<button type="button" class="difficulty-card easy" data-difficulty="easy" aria-pressed="false">
+					<span class="difficulty-pill">Easy</span>
+					<strong>Basic concept questions</strong>
+					<p>Direct KCET-style recall with clean, short prompts.</p>
+				</button>
+				<button type="button" class="difficulty-card medium" data-difficulty="medium" aria-pressed="false">
+					<span class="difficulty-pill">Medium</span>
+					<strong>Application-based</strong>
+					<p>Mixes concepts with moderate reasoning and problem solving.</p>
+				</button>
+				<button type="button" class="difficulty-card hard" data-difficulty="hard" aria-pressed="false">
+					<span class="difficulty-pill">Hard</span>
+					<strong>Analytical and multi-step</strong>
+					<p>Advanced, layered questions that demand deeper analysis.</p>
+				</button>
 			</div>
 		</section>
 
-		<section id="mockQuestionCard" class="panel-card mb-4 hidden">
-			<div class="question-meta">
-				<span id="questionCounter" class="counter-chip">Question 1 / 10</span>
-				<span id="questionTag" class="tag-chip">Physics</span>
+		<section id="quizSetPanel" class="panel-card mb-4 hidden">
+			<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+				<div>
+					<h2 class="section-heading"><i class="bi bi-grid-3x3-gap"></i>Select a Quiz</h2>
+					<p id="quizSetSummary" class="section-note mb-0">Generated quizzes will appear here.</p>
+				</div>
+				<button id="regenerateQuizzesBtn" type="button" class="btn btn-outline-secondary">Generate New Set</button>
 			</div>
-			<h3 id="questionText" class="question-title"></h3>
-			<div id="optionList" class="option-list"></div>
-			<div class="d-flex justify-content-between mt-3">
-				<button id="prevQuestionBtn" type="button" class="btn btn-outline-secondary" disabled>Previous</button>
-				<button id="nextQuestionBtn" type="button" class="btn btn-outline-primary">Next</button>
+			<div id="quizSetGrid" class="quiz-set-grid mt-3"></div>
+		</section>
+
+		<section id="quizRunnerPanel" class="panel-card mb-4 hidden">
+			<div id="examWarningBar" class="exam-warning hidden">Tab switched. Please return to the test window to continue fairly.</div>
+			<div class="quiz-runner-header">
+				<div>
+					<div id="activeQuizLabel" class="quiz-kicker">Quiz 1</div>
+					<h2 id="activeQuizTitle" class="section-heading mb-1">Mock Test</h2>
+					<p id="quizVariantFocus" class="section-note mb-0">Choose a quiz to begin.</p>
+				</div>
+				<div class="quiz-timer-stack">
+					<div id="timerDisplay" class="timer-chip">10:00</div>
+					<div id="quizSubjectMix" class="status-pill subtle">Physics + Chemistry + Math</div>
+				</div>
+			</div>
+
+			<div class="quiz-progress-shell">
+				<div class="progress-track">
+					<div id="questionProgressBar" class="progress-fill"></div>
+				</div>
+				<div class="progress-caption">
+					<span id="questionCounter">Question 1 / 10</span>
+					<span id="answeredCount">0 answered</span>
+				</div>
+			</div>
+
+			<div class="question-card">
+				<div class="question-meta">
+					<span id="questionTag" class="tag-chip">Physics</span>
+					<span id="questionStateChip" class="counter-chip">Attempt in progress</span>
+				</div>
+				<h3 id="questionText" class="question-title"></h3>
+				<div id="optionList" class="option-list"></div>
+			</div>
+
+			<div class="quiz-nav-row">
+				<div class="nav-group">
+					<button id="prevQuestionBtn" type="button" class="btn btn-outline-secondary" disabled>Previous</button>
+					<button id="nextQuestionBtn" type="button" class="btn btn-outline-primary">Next</button>
+				</div>
+				<button id="submitQuizBtn" type="button" class="btn btn-danger">Submit Quiz</button>
+			</div>
+
+			<div id="submitLoader" class="submit-loader hidden">
+				<div class="loader-spinner" aria-hidden="true"></div>
+				<div class="loader-text">Evaluating your answers and calculating rank...</div>
 			</div>
 		</section>
 
-		<section id="mockResultCard" class="panel-card hidden">
-			<h2 class="section-heading"><i class="bi bi-award"></i>Mock Test Result</h2>
-			<div class="result-grid">
+		<section id="resultPanel" class="panel-card mb-4 hidden">
+			<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+				<div>
+					<h2 class="section-heading"><i class="bi bi-award"></i>Quiz Result</h2>
+					<p id="resultSummaryText" class="section-note mb-0">Your score, mistakes, and feedback are shown below.</p>
+				</div>
+				<div class="result-action-row">
+					<button id="toggleReviewModeBtn" type="button" class="btn btn-outline-secondary">View All Questions</button>
+					<button id="retakeQuizBtn" type="button" class="btn btn-primary">Retake Quiz</button>
+				</div>
+			</div>
+
+			<div class="result-grid mt-3">
 				<div class="result-stat">
 					<div class="result-label">Score</div>
-					<div id="resultScore" class="result-value">0 / 10</div>
-				</div>
-				<div class="result-stat">
-					<div class="result-label">Correct</div>
-					<div id="resultCorrect" class="result-value text-success">0</div>
-				</div>
-				<div class="result-stat">
-					<div class="result-label">Wrong</div>
-					<div id="resultWrong" class="result-value text-danger">0</div>
+					<div id="resultScore" class="result-value">0 / 0</div>
 				</div>
 				<div class="result-stat">
 					<div class="result-label">Percentage</div>
 					<div id="resultPercentage" class="result-value">0%</div>
 				</div>
+				<div class="result-stat">
+					<div class="result-label">Time Taken</div>
+					<div id="resultTimeTaken" class="result-value">0:00</div>
+				</div>
+				<div class="result-stat">
+					<div class="result-label">Wrong</div>
+					<div id="resultWrong" class="result-value text-danger">0</div>
+				</div>
+			</div>
+
+			<div class="review-grid mt-4">
+				<article class="review-panel">
+					<h3 class="section-heading"><i class="bi bi-x-circle"></i>Review Mistakes</h3>
+					<p class="section-note">Only incorrectly answered questions appear here.</p>
+					<div id="mistakeReviewList" class="review-list"></div>
+				</article>
+				<article class="review-panel">
+					<h3 class="section-heading"><i class="bi bi-check2-square"></i>Full Review</h3>
+					<p class="section-note">Switch to full review to inspect every answer and correct option.</p>
+					<div id="fullReviewList" class="review-list hidden-review"></div>
+				</article>
+			</div>
+
+			<div class="feedback-panel mt-4">
+				<h3 class="section-heading"><i class="bi bi-lightbulb"></i>AI Feedback</h3>
+				<div id="feedbackList" class="insight-list"></div>
+			</div>
+		</section>
+
+		<section id="analyticsPanel" class="panel-card mb-4 hidden">
+			<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+				<div>
+					<h2 class="section-heading"><i class="bi bi-bar-chart"></i>Performance Analytics</h2>
+					<p class="section-note mb-0">Tracked accuracy by difficulty and weak subject areas from saved attempts.</p>
+				</div>
+				<div id="analyticsStatus" class="status-pill subtle">Synced with history</div>
+			</div>
+
+			<div class="analytics-grid mt-3">
+				<article class="chart-wrap analysis-card">
+					<h3 class="section-heading"><i class="bi bi-graph-up"></i>Accuracy by Difficulty</h3>
+					<canvas id="difficultyAccuracyChart"></canvas>
+				</article>
+				<article class="chart-wrap analysis-card">
+					<h3 class="section-heading"><i class="bi bi-pie-chart"></i>Weak Subjects</h3>
+					<canvas id="subjectWeaknessChart"></canvas>
+				</article>
+			</div>
+
+			<div class="history-panel mt-4">
+				<h3 class="section-heading"><i class="bi bi-clock-history"></i>Recent Attempts</h3>
+				<div id="recentAttemptsList" class="attempt-list"></div>
+			</div>
+
+			<div class="history-panel mt-4">
+				<h3 class="section-heading"><i class="bi bi-chat-dots"></i>Improvement Suggestions</h3>
+				<div id="analyticsSuggestions" class="insight-list"></div>
+			</div>
+		</section>
+
+		<section id="leaderboardPanel" class="panel-card mb-4 hidden">
+			<div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+				<div>
+					<h2 class="section-heading"><i class="bi bi-trophy"></i>Leaderboard</h2>
+					<p id="leaderboardSummary" class="section-note mb-0">Top performers are ranked by score first, then faster completion time.</p>
+				</div>
+				<div id="leaderboardStatus" class="status-pill subtle">Ready</div>
+			</div>
+
+			<div class="leaderboard-table-wrap mt-3">
+				<table class="table leaderboard-table align-middle mb-0">
+					<thead>
+						<tr>
+							<th scope="col">Rank</th>
+							<th scope="col">User</th>
+							<th scope="col">Score</th>
+							<th scope="col">Time</th>
+							<th scope="col">Accuracy</th>
+						</tr>
+					</thead>
+					<tbody id="leaderboardRows"></tbody>
+				</table>
+			</div>
+
+			<div id="yourRankCard" class="your-rank-card mt-3 hidden">
+				<div class="your-rank-title">Your Result</div>
+				<div class="your-rank-metrics">
+					<div><span>Your Rank</span><strong id="yourRankValue">-</strong></div>
+					<div><span>Your Score</span><strong id="yourScoreValue">-</strong></div>
+					<div><span>Your Accuracy</span><strong id="yourAccuracyValue">-</strong></div>
+				</div>
+			</div>
+
+			<div class="result-action-row mt-3">
+				<button id="playAgainBtn" type="button" class="btn btn-primary">Play Again</button>
+				<button id="reviewMistakesBtn" type="button" class="btn btn-outline-secondary">Review Mistakes</button>
 			</div>
 		</section>
 	</main>

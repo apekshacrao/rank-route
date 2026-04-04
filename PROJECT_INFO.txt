@@ -1,0 +1,63 @@
+RANK ROUTE - PROJECT INFO
+=========================
+
+Overview
+--------
+RankRoute is a Flask-based KCET college predictor with:
+- rank prediction API
+- user auth + prediction history APIs
+- mock test generation and scoring
+- cutoff trend analytics and forecast
+- static frontend served by Flask
+
+APIs Used In This Project
+-------------------------
+1) Internal Backend APIs (Flask routes)
+- GET /api/health
+- POST /predict
+- GET /cutoff-trends
+- GET /cutoff-forecast
+- POST /generate-test
+- POST /submit-test
+- POST /users
+- POST /auth/login
+- GET /users/<user_id>
+- PUT /users/<user_id>
+- DELETE /users/<user_id>
+- POST /predictions
+- GET /predictions/<prediction_id>
+- GET /users/<user_id>/predictions
+- PUT /predictions/<prediction_id>
+- DELETE /predictions/<prediction_id>
+
+2) External API
+- OpenAI Chat Completions API:
+  https://api.openai.com/v1/chat/completions
+  Used only when mock test request has use_ai=true and OPENAI_API_KEY is set.
+
+AI/ML Used
+----------
+1) Main college prediction model
+- scikit-learn RandomForestClassifier (default)
+- Alternatives supported in training code: DecisionTreeClassifier, LogisticRegression
+- Trained from backend/data/dataset.csv
+- Model files: backend/model/model.pkl and backend/model/encoder.pkl
+
+2) Analytics forecast model
+- scikit-learn LinearRegression
+- Used in cutoff forecast for next-year cutoff estimation.
+
+3) Generative AI (optional)
+- OpenAI model: gpt-4o-mini
+- Used for generating mock test questions when AI generation is enabled.
+
+Data/Storage
+------------
+- SQLite database for users and predictions
+- Local JSON files for question bank and cutoff data
+
+Run Commands
+------------
+- python -m pip install -r requirements.txt
+- python backend/model/train_model.py
+- python backend/app.py

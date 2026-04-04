@@ -49,9 +49,6 @@ SELECT c.id, b.id, 'GM', 2024, 5100
 FROM colleges c CROSS JOIN branches b
 WHERE c.college_name = 'MS Ramaiah Institute of Technology' AND b.branch_name = 'AIML';
 
-INSERT OR IGNORE INTO users (name, email, password)
-VALUES ('Demo User', 'demo@kcetcompass.com', 'demo_password_hash');
-
 INSERT OR IGNORE INTO analytics (branch_id, average_salary, placement_percentage)
 SELECT id, 14.2, 92.5 FROM branches WHERE branch_name = 'CSE';
 
