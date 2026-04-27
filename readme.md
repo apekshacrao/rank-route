@@ -5,6 +5,7 @@ RankRoute now includes a machine learning pipeline for college prediction, AI/lo
 
 ## Features
 - ML-powered `/predict` endpoint with confidence score and ranked college predictions.
+- College Map Explorer with `/colleges` catalog data for interactive map rendering.
 - Optional OpenAI-based mock test generation with local fallback question bank.
 - `/submit-test` scoring with answer review and timer-aware auto-submit behavior.
 - Personalized recommendations for top colleges and branches.
@@ -94,9 +95,21 @@ Returns score, correct/wrong count, percentage, and detailed review.
 GET `/cutoff-trends?category=GM&branch=CSE`
 GET `/cutoff-forecast?category=GM&branch=CSE`
 
+### College Map Data
+GET `/colleges`
+
+Returns college names, coordinates, branches, and last-year cutoff data for the map explorer page.
+
 ## OpenAI Integration (Optional)
 Set environment variable before starting backend:
 - Windows PowerShell: `$env:OPENAI_API_KEY="your_key_here"`
+
+## Google Maps Integration
+The new College Map Explorer page uses the Google Maps JavaScript API.
+- Set `window.RANKROUTE_MAP_CONFIG.googleMapsApiKey` in `frontend/html/map.html`, or
+- Store a key in browser localStorage under `rankroute_google_maps_api_key`
+
+If no key is configured, the page still shows the college list and prediction sync state, but the live map view stays disabled.
 
 ## Notes
 - Train the model before calling `/predict`.

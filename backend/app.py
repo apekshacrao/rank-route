@@ -4,6 +4,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 from database.db import init_db_for_app
+from routes.colleges import colleges_bp
 from routes.analytics import analytics_bp
 from routes.mocktest import mocktest_bp
 from routes.predictions import predictions_bp
@@ -29,6 +30,7 @@ def create_app() -> Flask:
     init_db_for_app(app, seed=True)
 
     app.register_blueprint(predict_bp)
+    app.register_blueprint(colleges_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(mocktest_bp)
     app.register_blueprint(users_bp)

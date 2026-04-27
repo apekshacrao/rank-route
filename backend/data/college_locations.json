@@ -1,0 +1,60 @@
+{
+	"colleges": [
+		{
+			"college_name": "RV College of Engineering",
+			"area": "RV Vidyaniketan",
+			"city": "Bengaluru",
+			"latitude": 12.9239,
+			"longitude": 77.4989
+		},
+		{
+			"college_name": "BMS College of Engineering",
+			"area": "Bull Temple Road",
+			"city": "Bengaluru",
+			"latitude": 12.9391,
+			"longitude": 77.5673
+		},
+		{
+			"college_name": "PES University",
+			"area": "Ring Road Campus",
+			"city": "Bengaluru",
+			"latitude": 12.9348,
+			"longitude": 77.5968
+		},
+		{
+			"college_name": "MS Ramaiah Institute of Technology",
+			"area": "MSR Nagar",
+			"city": "Bengaluru",
+			"latitude": 13.0317,
+			"longitude": 77.5644
+		},
+		{
+			"college_name": "Dayananda Sagar College of Engineering",
+			"area": "Kumaraswamy Layout",
+			"city": "Bengaluru",
+			"latitude": 12.905,
+			"longitude": 77.5633
+		},
+		{
+			"college_name": "CMR Institute of Technology",
+			"area": "Kalyan Nagar",
+			"city": "Bengaluru",
+			"latitude": 13.0285,
+			"longitude": 77.686
+		},
+		{
+			"college_name": "Nitte Meenakshi Institute of Technology",
+			"area": "Yelahanka",
+			"city": "Bengaluru",
+			"latitude": 13.0779,
+			"longitude": 77.5973
+		},
+		{
+			"college_name": "New Horizon College of Engineering",
+			"area": "Bellandur",
+			"city": "Bengaluru",
+			"latitude": 12.9137,
+			"longitude": 77.6878
+		}
+	]
+}

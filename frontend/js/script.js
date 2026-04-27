@@ -1,6 +1,7 @@
 const API_BASE_URL = "http://127.0.0.1:5000";
 const SUBJECT_ANALYSIS_STORAGE_KEY = "kcet_subject_scores";
 const SUBJECT_TARGET_SCORE = 85;
+const LAST_PREDICTION_STORAGE_KEY = "rankroute_last_prediction";
 
 let subjectScoreChartInstance = null;
 let subjectGapChartInstance = null;
@@ -39,6 +40,10 @@ function getStoredUser() {
 
 function setStoredUser(user) {
 	localStorage.setItem("kcet_user", JSON.stringify(user));
+}
+
+function setStoredPrediction(predictionState) {
+	localStorage.setItem(LAST_PREDICTION_STORAGE_KEY, JSON.stringify(predictionState));
 }
 
 function renderPredictionTable(predictions) {
@@ -279,6 +284,12 @@ async function handlePredict(event) {
 	const renderedPredictions = data.predictions || data.predicted_colleges || [];
 	result.innerHTML = renderPredictionTable(renderedPredictions);
 	renderAIPredictorPanel(data, payload);
+
+	setStoredPrediction({
+		createdAt: new Date().toISOString(),
+		request: payload,
+		response: data,
+	});
 }
 
 async function renderCutoffChart() {
