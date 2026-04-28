@@ -6,6 +6,10 @@ const LAST_PREDICTION_STORAGE_KEY = "rankroute_last_prediction";
 let subjectScoreChartInstance = null;
 let subjectGapChartInstance = null;
 let cutoffChartInstance = null;
+let dashboardMap = null;
+let dashboardMarkerLayer = null;
+let collegesData = [];
+let userLocation = null; // {lat, lng}
 
 function getSmoothChartAnimationOptions() {
  	return {
@@ -51,41 +55,216 @@ function renderPredictionTable(predictions) {
 		return "<div class='alert alert-warning'>No colleges found for your inputs.</div>";
 	}
 
-	const rows = predictions
-		.map((item) => {
-			const chanceValue = item.chance || item.admission_chance || "Low";
-			const chanceClass = chanceValue === "High"
-				? "text-success"
-				: chanceValue === "Medium"
-					? "text-warning"
-					: "text-danger";
-			const collegeName = item.college || item.college_name || "-";
-			const cutoffValue = item.last_year_cutoff || "-";
+	// Build card-based UI for predictions
+	const cards = predictions.map((item, idx) => {
+		const collegeName = item.college || item.college_name || "Unknown College";
+		const branch = item.branch || '-';
+		const cutoffValue = item.last_year_cutoff || item.cutoff || '-';
+		const chanceValue = item.chance || item.admission_chance || 'Low';
+		const chanceClass = chanceValue === 'High' ? 'text-success' : chanceValue === 'Medium' ? 'text-warning' : 'text-danger';
 
-			return `
-				<tr>
-					<td>${collegeName}</td>
-					<td>${item.branch}</td>
-					<td>${cutoffValue}</td>
-					<td class="${chanceClass}">${chanceValue}</td>
-				</tr>
-			`;
-		})
-		.join("");
+		return `
+			<article class="prediction-card panel-card" data-college="${escapeHtml(collegeName)}">
+				<div class="prediction-grid">
+					<div class="pred-info">
+						<h5 class="pred-title">${escapeHtml(collegeName)}</h5>
+						<div class="pred-meta">${escapeHtml(branch)} • Cutoff: ${escapeHtml(String(cutoffValue))}</div>
+						<div class="pred-chance ${chanceClass}">${escapeHtml(chanceValue)}</div>
+						<div class="pred-distance" id="distance-${idx}">Calculating distance...</div>
+						<div class="pred-facilities" id="fac-${idx}"></div>
+					</div>
+					<div class="pred-map">
+						<div id="miniMap-${idx}" class="mini-map"></div>
+						<div class="pred-actions mt-2">
+							<button class="btn btn-sm btn-outline-primary view-dir" data-lat="${item.latitude || ''}" data-lng="${item.longitude || ''}">View Directions</button>
+						</div>
+					</div>
+				</div>
+			</article>
+		`;
+	}).join('');
 
-	return `
-		<table class="table table-bordered table-striped">
-			<thead>
-				<tr>
-					<th>College</th>
-					<th>Branch</th>
-					<th>Last Year Cutoff</th>
-					<th>Admission Chance</th>
-				</tr>
-			</thead>
-			<tbody>${rows}</tbody>
-		</table>
-	`;
+	// After rendering, initialize mini-maps and distance calculations
+	setTimeout(() => {
+		// ensure collegesData loaded
+		if (!collegesData.length) {
+			loadCollegesData().then(() => {
+				enrichPredictionCards(predictions);
+			}).catch(() => enrichPredictionCards(predictions));
+		} else {
+			enrichPredictionCards(predictions);
+		}
+	}, 50);
+
+	return `<div class="predictions-list">${cards}</div>`;
+}
+
+function escapeHtml(text) {
+	return String(text).replace(/[&<>"'`]/g, (s) => ({
+		'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;'
+	}[s]));
+}
+
+function enrichPredictionCards(predictions) {
+	predictions.forEach((item, idx) => {
+		const name = item.college || item.college_name;
+		const col = findCollegeByName(name);
+		// distance
+		computeAndShowDistance(idx, col, item);
+		// facilities
+		showFacilities(idx, col);
+		// mini map
+		initMiniMap(idx, col || item);
+	});
+
+	// Wire up directions buttons
+	document.querySelectorAll('.view-dir').forEach((btn) => {
+		btn.addEventListener('click', (e) => {
+			const lat = btn.dataset.lat;
+			const lng = btn.dataset.lng;
+			if (!lat || !lng) {
+				showToast('Coordinates not available for this college');
+				return;
+			}
+			const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+			window.open(url, '_blank');
+		});
+	});
+}
+
+function findCollegeByName(name) {
+	if (!name || !collegesData.length) return null;
+	return collegesData.find(c => (c.name || c.college_name || '').toLowerCase().includes(String(name).toLowerCase()));
+}
+
+function computeAndShowDistance(idx, college, item) {
+	const el = document.getElementById(`distance-${idx}`);
+	if (!el) return;
+	if (!userLocation) {
+		getUserLocation().then((loc) => {
+			userLocation = loc;
+			computeAndShowDistance(idx, college, item);
+		}).catch(() => {
+			userLocation = { lat: 12.9715987, lng: 77.5945627 }; // Bangalore fallback
+			computeAndShowDistance(idx, college, item);
+		});
+		return;
+	}
+
+	const lat = (item.latitude || (college && college.latitude)) || null;
+	const lng = (item.longitude || (college && college.longitude)) || null;
+	if (!lat || !lng) {
+		el.textContent = 'Distance: N/A';
+		return;
+	}
+	const d = haversineDistance(userLocation.lat, userLocation.lng, Number(lat), Number(lng));
+	el.textContent = `${d.toFixed(1)} km away from your location`;
+}
+
+function showFacilities(idx, college) {
+	const container = document.getElementById(`fac-${idx}`);
+	if (!container) return;
+	if (!college || !college.nearby) {
+		container.innerHTML = '<small class="text-muted">No nearby facilities data</small>';
+		return;
+	}
+	const nearby = college.nearby;
+	const icons = [];
+	if (nearby.malls && nearby.malls.length) icons.push(`<span title="Malls">🛍️ ${nearby.malls[0]}</span>`);
+	if (nearby.bus_stops && nearby.bus_stops.length) icons.push(`<span title="Bus stop">🚌 ${nearby.bus_stops[0]}</span>`);
+	if (nearby.metro && nearby.metro.length) icons.push(`<span title="Metro">🚇 ${nearby.metro[0]}</span>`);
+	if (nearby.hospitals && nearby.hospitals.length) icons.push(`<span title="Hospital">🏥 ${nearby.hospitals[0]}</span>`);
+	container.innerHTML = icons.join(' • ');
+}
+
+function initMiniMap(idx, college) {
+	const containerId = `miniMap-${idx}`;
+	const el = document.getElementById(containerId);
+	if (!el) return;
+	// clear previous if any
+	el.innerHTML = '';
+	const lat = college && (college.latitude || college.lat || college.lat);
+	const lng = college && (college.longitude || college.lng || college.lon || college.long);
+	const map = L.map(containerId, { attributionControl: false, zoomControl: false }).setView([lat || 12.9716, lng || 77.5946], lat && lng ? 13 : 6);
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+	if (lat && lng) {
+		const m = L.marker([lat, lng]).addTo(map);
+		map.setView([lat, lng], 13);
+	}
+}
+
+function loadCollegesData() {
+	return fetch('/data/colleges.json').then(r => r.json()).then(j => { collegesData = j.colleges || []; return collegesData; });
+}
+
+function initDashboardMap() {
+	if (dashboardMap) return dashboardMap;
+	const el = document.getElementById('dashboardMap');
+	if (!el || typeof L === 'undefined') return null;
+	// Center roughly on Karnataka
+	const center = [13.0, 75.5];
+	dashboardMap = L.map('dashboardMap', { minZoom: 6 }).setView(center, 7);
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(dashboardMap);
+	dashboardMarkerLayer = L.layerGroup().addTo(dashboardMap);
+	// load data and add markers
+	loadCollegesData().then(() => addMarkersToDashboard(collegesData));
+	return dashboardMap;
+}
+
+function addMarkersToDashboard(list) {
+	if (!dashboardMarkerLayer) dashboardMarkerLayer = L.layerGroup().addTo(dashboardMap);
+	dashboardMarkerLayer.clearLayers();
+	list.forEach(c => {
+		if (!c.latitude || !c.longitude) return;
+		const icon = L.divIcon({ className: 'custom-marker', html: '<div class="marker-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] });
+		const m = L.marker([c.latitude, c.longitude], { icon }).addTo(dashboardMarkerLayer);
+		const popupHtml = `
+			<div style="min-width:200px">
+			  <strong>${escapeHtml(c.name)}</strong>
+			  <div style="font-size:13px;color:#55607d;margin-top:6px">${escapeHtml(c.description || '')}</div>
+			  <div style="margin-top:8px;font-size:13px">Branches: ${escapeHtml((c.branches||[]).join(', '))}</div>
+			  <div style="margin-top:4px;font-size:13px">Last cutoff: ${escapeHtml(String(c.last_year_cutoff || c.last_year_cutoff || '-'))}</div>
+			</div>
+		`;
+		m.bindPopup(popupHtml);
+		m.on('mouseover', () => m.openPopup());
+		m.on('mouseout', () => m.closePopup());
+	});
+}
+
+function highlightMarkersForPredictions(predictions) {
+	if (!dashboardMarkerLayer || !predictions) return;
+	// open popup for matches and pan map lightly
+	predictions.forEach(p => {
+		const match = findCollegeByName(p.college || p.college_name);
+		if (match) {
+			const lat = match.latitude, lng = match.longitude;
+			dashboardMap.panTo([lat, lng]);
+			// find marker and open popup
+			dashboardMarkerLayer.eachLayer(layer => {
+				if (layer.getLatLng && layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
+					layer.openPopup();
+				}
+			});
+		}
+	});
+}
+
+function haversineDistance(lat1, lon1, lat2, lon2) {
+	const toRad = (v) => v * Math.PI / 180;
+	const R = 6371; // km
+	const dLat = toRad(lat2 - lat1);
+	const dLon = toRad(lon2 - lon1);
+	const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	return R * c;
+}
+
+function getUserLocation() {
+	return new Promise((resolve, reject) => {
+		if (!navigator.geolocation) return reject('geolocation-unavailable');
+		navigator.geolocation.getCurrentPosition((pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }), (err) => reject(err), { timeout: 8000 });
+	});
 }
 
 function renderAIPredictorPanel(apiData, requestPayload) {
@@ -283,6 +462,14 @@ async function handlePredict(event) {
 	status.innerHTML = `<div class="alert alert-info">${saveText}</div>`;
 	const renderedPredictions = data.predictions || data.predicted_colleges || [];
 	result.innerHTML = renderPredictionTable(renderedPredictions);
+
+	// ensure dashboard map exists and highlight markers for these results
+	try {
+		initDashboardMap();
+		highlightMarkersForPredictions(renderedPredictions);
+	} catch (e) {
+		// ignore map errors
+	}
 	renderAIPredictorPanel(data, payload);
 
 	setStoredPrediction({
@@ -716,6 +903,169 @@ function setupSidebarToggle() {
 	});
 }
 
+/* ----------------- Additional UI helpers ----------------- */
+
+function animateCounters() {
+	const counters = document.querySelectorAll('.stat-value[data-target]');
+	counters.forEach((el) => {
+		const target = Number(el.dataset.target || 0);
+		let current = 0;
+		const step = Math.max(1, Math.floor(target / 80));
+		const tick = () => {
+			current += step;
+			if (current >= target) {
+				el.textContent = String(target);
+			} else {
+				el.textContent = String(current);
+				requestAnimationFrame(tick);
+			}
+		};
+		requestAnimationFrame(tick);
+	});
+}
+
+function setupNotifications() {
+	const bell = document.getElementById('notifBell');
+	const badge = document.getElementById('notifBadge');
+	if (!bell) return;
+
+	// Use the same storage key as notifications page
+	const STORAGE_KEY = 'rr_notifications_v1';
+	let notifications = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+	if (!Array.isArray(notifications)) {
+		// Seed with official, student-relevant notifications only (government / exam)
+		const now = Date.now();
+		notifications = [
+			{
+				id: 1,
+				title: 'KCET counseling schedule released',
+				text: 'KEA has released the official counseling schedule. Check dates and deadlines.',
+				datetime: new Date(now - 2 * 3600 * 1000).toISOString(),
+				type: 'government',
+				priority: 'high',
+				read: false,
+			},
+			{
+				id: 2,
+				title: 'PESSAT registrations open',
+				text: 'PESSAT registration window is open. Apply before the deadline.',
+				datetime: new Date(now - 24 * 3600 * 1000).toISOString(),
+				type: 'exam',
+				priority: 'medium',
+				read: false,
+			},
+			{
+				id: 3,
+				title: 'COMEDK admit card available',
+				text: 'COMEDK admit cards have been released. Download from official portal.',
+				datetime: new Date(now - 3 * 24 * 3600 * 1000).toISOString(),
+				type: 'exam',
+				priority: 'high',
+				read: false,
+			}
+		];
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+	}
+
+	// Add a KEA PSIT notification if not already present (small official alert)
+	const hasKeaPsit = notifications.some(n => (n.title || '').toLowerCase().includes('kea psit'));
+	if (!hasKeaPsit) {
+		const psitNotice = {
+			id: Date.now(),
+			title: 'KEA PSIT update',
+			text: 'Official KEA PSIT information is available — check the KEA portal for details.',
+			datetime: new Date().toISOString(),
+			type: 'government',
+			priority: 'high',
+			read: false,
+		};
+		notifications.unshift(psitNotice);
+		// keep only recent 20 in storage
+		notifications = notifications.slice(0, 20);
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+	}
+
+	function updateBadge() {
+		// Show red badge ONLY if there are unread high-priority notifications
+		const unreadHigh = notifications.filter(n => !n.read && n.priority === 'high').length;
+		if (!badge) return;
+		if (unreadHigh > 0) {
+			badge.textContent = String(unreadHigh);
+			badge.style.display = 'inline-flex';
+		} else {
+			badge.style.display = 'none';
+		}
+	}
+
+	// update badge on load
+	updateBadge();
+
+	// Clicking the bell now redirects to the notifications page (full view)
+	bell.addEventListener('click', (ev) => {
+		window.location.href = '/html/notifications.html';
+	});
+}
+
+function showToast(message = '', timeout = 2200) {
+	const t = document.createElement('div');
+	t.className = 'rr-toast';
+	t.textContent = message;
+	Object.assign(t.style, { position: 'fixed', right: '18px', bottom: '18px', background: '#0d1738', color:'#fff', padding:'10px 14px', borderRadius:'10px', boxShadow:'0 12px 30px rgba(4,12,40,0.4)', zIndex:9999 });
+	document.body.appendChild(t);
+	setTimeout(() => t.style.opacity = '0.01', timeout - 300);
+	setTimeout(() => t.remove(), timeout);
+}
+
+function setupExamButtons() {
+	document.querySelectorAll('.apply-btn').forEach((btn) => {
+		btn.addEventListener('click', (e) => {
+			const card = btn.closest('.exam-card');
+			const exam = card?.dataset?.exam || 'exam';
+			// open apply page — placeholder
+			window.open('/html/predictorpage.html', '_blank');
+			showToast(`Opening application page for ${exam}`);
+		});
+	});
+
+	document.querySelectorAll('.remind-btn').forEach((btn) => {
+		btn.addEventListener('click', (e) => {
+			const card = btn.closest('.exam-card');
+			const exam = card?.dataset?.exam || 'exam';
+			showToast(`Reminder set for ${exam}`);
+		});
+	});
+}
+
+function setupThemeToggle() {
+	const toggle = document.getElementById('themeToggle');
+	if (!toggle) return;
+	const apply = (mode) => {
+		if (mode === 'dark') document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
+		localStorage.setItem('rankroute_theme', mode);
+		toggle.innerHTML = mode === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon-stars"></i>';
+	};
+	const stored = localStorage.getItem('rankroute_theme') || 'light';
+	apply(stored);
+	toggle.addEventListener('click', () => {
+		const cur = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+		apply(cur === 'dark' ? 'light' : 'dark');
+	});
+}
+
+function setupButtonRipples() {
+	document.addEventListener('click', (ev) => {
+		const btn = ev.target.closest('.btn');
+		if (!btn) return;
+		const rect = btn.getBoundingClientRect();
+		const ripple = document.createElement('span');
+		ripple.className = 'ripple';
+		Object.assign(ripple.style, { left: (ev.clientX - rect.left) + 'px', top: (ev.clientY - rect.top) + 'px' });
+		btn.appendChild(ripple);
+		setTimeout(() => ripple.remove(), 600);
+	});
+}
+
+/* ----------------- Initialization ----------------- */
 document.addEventListener("DOMContentLoaded", () => {
 	setupForms();
 	setupDashboard();
@@ -724,4 +1074,16 @@ document.addEventListener("DOMContentLoaded", () => {
 	renderCutoffChart();
 	setupSubjectAnalysis();
 	renderAIPredictorPlaceholder();
+	animateCounters();
+	setupNotifications();
+	setupExamButtons();
+	setupThemeToggle();
+	setupButtonRipples();
+
+	// initialize dashboard map if present
+	try { initDashboardMap(); } catch (e) { /* ignore if leaflet missing */ }
+
+	// map / explore buttons
+	document.getElementById('exploreMapBtn')?.addEventListener('click', () => window.location.href = '/html/map.html');
+	document.getElementById('openMapBtn')?.addEventListener('click', () => window.location.href = '/html/map.html');
 });

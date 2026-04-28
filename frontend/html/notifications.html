@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notifications — RankRoute</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="gradient-bg">
+  <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="brand-wrap">
+        <div class="brand-icon">RR</div>
+        <div>
+          <div class="brand-title">RankRoute</div>
+          <div class="brand-subtitle">AI College Predictor</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="/html/dashboard.html"><i class="bi bi-house-door"></i>Dashboard</a>
+        <a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Predictor</a>
+        <a class="nav-item" href="/html/map.html"><i class="bi bi-map"></i>Map</a>
+      </nav>
+    </aside>
+
+    <main class="content-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <a href="/html/dashboard.html" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-arrow-left"></i> Back</a>
+          <h2 style="margin:0; color:#1a2753">Notifications</h2>
+        </div>
+        <div class="topbar-right">
+          <button id="markAllPage" class="link-muted">Mark all as read</button>
+        </div>
+      </header>
+
+      <section class="panel-card mt-3">
+          <div id="notificationsList"></div>
+        </section>
+
+      </main>
+    </div>
+
+  <script>
+  // dynamic notifications page — uses same localStorage key as dashboard
+  const STORAGE_KEY = 'rr_notifications_v1';
+
+  function escapeHtml(text){ return String(text).replace(/[&<>"'`]/g, (s)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;','`':'&#96;'}[s])); }
+
+  function loadNotifications(){
+    let n = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    if(!Array.isArray(n)) n = [];
+    return n;
+  }
+
+  function saveNotifications(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+
+  function seedOfficialNotificationsIfEmpty(){
+    const cur = loadNotifications();
+    if (Array.isArray(cur) && cur.length > 0) return;
+    const now = Date.now();
+    const sample = [
+      { id: now+1, title: 'KCET counseling schedule released', text: 'KEA released the counseling schedule. Check dates and option entry deadlines.', datetime: new Date(now - 2*3600*1000).toISOString(), type: 'government', priority: 'high', read: false },
+      { id: now+2, title: 'PESSAT registrations open', text: 'PESSAT registration window is open. Apply before the deadline.', datetime: new Date(now - 24*3600*1000).toISOString(), type: 'exam', priority: 'medium', read: false },
+      { id: now+3, title: 'COMEDK admit card available', text: 'COMEDK admit cards released. Download from official portal.', datetime: new Date(now - 3*24*3600*1000).toISOString(), type: 'exam', priority: 'high', read: false },
+      { id: now+4, title: 'Seat allotment results published', text: 'KEA published seat allotment results for round 1. Check your credentials.', datetime: new Date(now - 5*3600*1000).toISOString(), type: 'government', priority: 'high', read: false },
+      { id: now+5, title: 'Option entry deadline approaching', text: 'Option entry deadline for KCET counseling is in 48 hours. Submit preferences.', datetime: new Date(now - 12*3600*1000).toISOString(), type: 'government', priority: 'high', read: false },
+      { id: now+6, title: 'PESSAT result announcement', text: 'PESSAT results are expected soon. Keep your application ID ready.', datetime: new Date(now - 18*3600*1000).toISOString(), type: 'exam', priority: 'medium', read: false }
+    ];
+    saveNotifications(sample);
+  }
+
+  function renderPage(){
+    const list = loadNotifications();
+    const container = document.getElementById('notificationsList');
+    if(!container) return;
+    // Filter to allowed types (government, exam) and sort by datetime desc
+    const allowed = (list || []).filter(i => i && (i.type === 'government' || i.type === 'exam'))
+        .sort((a,b) => new Date(b.datetime || b.date || 0) - new Date(a.datetime || a.date || 0))
+        .slice(0, 7);
+
+    if(!allowed.length){ container.innerHTML = '<div class="p-4 text-center text-muted">No official notifications</div>'; return; }
+
+    container.innerHTML = allowed.map((item, idx)=>{
+      const timeAgo = timeAgoText(item.datetime);
+      const typeCls = item.type === 'government' ? 'type-gov' : 'type-exam';
+      const priorityCls = item.priority === 'high' ? 'priority-high' : '';
+      return `
+      <article class="notif-row ${item.read? '': 'new'} ${typeCls} ${priorityCls}" data-idx="${idx}">
+        <div class="notif-row-body">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="type-indicator ${typeCls}"></span>
+            <div>
+              <div class="notif-row-title">${escapeHtml(item.title)}</div>
+              <div class="notif-row-meta">${escapeHtml(timeAgo)}</div>
+            </div>
+          </div>
+          <p class="notif-row-text">${escapeHtml(item.text || '')}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <button class="btn btn-sm btn-outline-secondary mark-btn">${item.read? 'Seen': 'Mark read'}</button>
+        </div>
+      </article>
+    `}).join('');
+
+    // wire handlers
+    container.querySelectorAll('.notif-row').forEach(row=>{
+      const i = Number(row.dataset.idx);
+      row.addEventListener('click', ()=>{
+        const list = loadNotifications(); list[i].read = true; saveNotifications(list); renderPage();
+      });
+      row.querySelector('.mark-btn')?.addEventListener('click', (ev)=>{ ev.stopPropagation(); const list = loadNotifications(); list[i].read = true; saveNotifications(list); renderPage(); });
+    });
+  }
+
+  function timeAgoText(iso) {
+    if (!iso) return '';
+    const then = new Date(iso).getTime();
+    const diff = Math.max(0, Date.now() - then);
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    seedOfficialNotificationsIfEmpty();
+    document.getElementById('markAllPage')?.addEventListener('click', ()=>{ const list = loadNotifications(); list.forEach(x=>x.read=true); saveNotifications(list); renderPage(); });
+    renderPage();
+  });
+  </script>
+</body>
+</html>

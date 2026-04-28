@@ -1,0 +1,67 @@
+{
+  "colleges": [
+    {
+      "name": "RV College of Engineering",
+      "latitude": 12.9239,
+      "longitude": 77.4989,
+      "branches": ["CSE", "ISE", "ECE"],
+      "last_year_cutoff": 2300,
+      "description": "Top private engineering college in Bengaluru.",
+      "nearby": {"malls": ["Forum Mall"], "bus_stops": ["RV College Bus Stop"], "metro": ["Banashankari (proposed)"], "hospitals": ["Apollo Clinic"]}
+    },
+    {
+      "name": "BMS College of Engineering",
+      "latitude": 12.9391,
+      "longitude": 77.5673,
+      "branches": ["CSE", "ECE", "ME"],
+      "last_year_cutoff": 1900,
+      "description": "Established government-aided technical institute.",
+      "nearby": {"malls": ["Mantri Mall"], "bus_stops": ["BMS Bus Stop"], "metro": ["Lalbagh"], "hospitals": ["Fortis Hospital"]}
+    },
+    {
+      "name": "PES University",
+      "latitude": 12.9348,
+      "longitude": 77.5968,
+      "branches": ["CSE", "AIML", "ECE"],
+      "last_year_cutoff": 2500,
+      "description": "Well-known private university with strong placements.",
+      "nearby": {"malls": ["Forum Mall"], "bus_stops": ["PES Bus Stop"], "metro": ["Yelachenahalli"], "hospitals": ["Sakra World Hospital"]}
+    },
+    {
+      "name": "MS Ramaiah Institute of Technology",
+      "latitude": 13.0317,
+      "longitude": 77.5644,
+      "branches": ["CSE", "ECE", "Civil"],
+      "last_year_cutoff": 3000,
+      "description": "Reputed institute known for engineering and research.",
+      "nearby": {"malls": ["Gopalan Mall"], "bus_stops": ["MSRIT Bus Stop"], "metro": [], "hospitals": ["Ramaiah Memorial Hospital"]}
+    },
+    {
+      "name": "Dayananda Sagar College of Engineering",
+      "latitude": 12.905,
+      "longitude": 77.5633,
+      "branches": ["CSE", "ECE", "ISE"],
+      "last_year_cutoff": 4200,
+      "description": "Large private college with multiple campuses.",
+      "nearby": {"malls": [], "bus_stops": ["DSCE Bus Stop"], "metro": [], "hospitals": ["Sagar Hospitals"]}
+    },
+    {
+      "name": "Nitte Meenakshi Institute of Technology",
+      "latitude": 13.0779,
+      "longitude": 77.5973,
+      "branches": ["CSE", "ECE", "ME"],
+      "last_year_cutoff": 4800,
+      "description": "Popular private college in north Bengaluru.",
+      "nearby": {"malls": ["Phoenix Marketcity"], "bus_stops": ["NMIT Bus Stop"], "metro": [], "hospitals": ["NIMHANS"]}
+    },
+    {
+      "name": "New Horizon College of Engineering",
+      "latitude": 12.9137,
+      "longitude": 77.6878,
+      "branches": ["CSE", "ISE", "ECE"],
+      "last_year_cutoff": 5100,
+      "description": "Campus in eastern Bengaluru with industry ties.",
+      "nearby": {"malls": [], "bus_stops": ["New Horizon Bus Stop"], "metro": [], "hospitals": ["Columbia Asia"]}
+    }
+  ]
+}

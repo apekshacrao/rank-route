@@ -1,104 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>RankRoute — Dashboard</title>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+0F6kQfY8jvYk3nT1YkQYQbY9b4g+g6X2Q5P5v5uM=" crossorigin=""/>
+	<link rel="stylesheet" href="/css/style.css">
 </head>
 
-<body>
-<div class="app-shell">
-	<aside class="app-sidebar">
-		<div class="brand-wrap">
-			<div class="brand-icon"><i class="bi bi-graph-up-arrow"></i></div>
-			<div>
-				<div class="brand-title">RANK ROUTE</div>
-				<div class="brand-subtitle">AI College Predictor</div>
-			</div>
-		</div>
-
-		<nav class="sidebar-nav">
-			<a class="nav-item active" href="/html/dashboard.html"><i class="bi bi-house-door"></i>Dashboard</a>
-			<a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Rank Predictor</a>
-			<a class="nav-item" href="/html/map.html"><i class="bi bi-map"></i>College Map Explorer</a>
-			<a class="nav-item" href="/html/crashcourse.html"><i class="bi bi-play-circle"></i>Crash Course</a>
-			<a class="nav-item" href="/html/mocktest.html"><i class="bi bi-journal-check"></i>Mock Test</a>
-			<a class="nav-item" href="/html/comparison.html"><i class="bi bi-mortarboard"></i>Results</a>
-			<a class="nav-item" href="/html/analytics.html"><i class="bi bi-bar-chart"></i>Analytics</a>
-		</nav>
-
-		<div class="sidebar-footer">
-			<a class="nav-item" href="/html/login.html"><i class="bi bi-box-arrow-right"></i>Sign Out</a>
-		</div>
-	</aside>
-
-	<main class="content-area">
-		<div class="page-toolbar">
-			<button class="sidebar-toggle" type="button" aria-label="Open menu"><i class="bi bi-list"></i></button>
-		</div>
-		<h1 class="page-title" id="dashboardWelcome">Welcome Student</h1>
-		<p class="page-subtitle">Your personalized counseling dashboard.</p>
-
-		<section class="dashboard-phrases" aria-label="Guidance highlights">
-			<article class="phrase-card">
-				<p class="phrase-tag">AI Guidance</p>
-				<h2>Predict smarter, apply with confidence.</h2>
-				<p>Use your KCET rank, category, and branch preference to get realistic college options.</p>
-			</article>
-			<article class="phrase-card">
-				<p class="phrase-tag">Performance Growth</p>
-				<h2>Small score gains can unlock bigger opportunities.</h2>
-				<p>Track subject-wise trends and focus where your improvement potential is highest.</p>
-			</article>
-			<article class="phrase-card">
-				<p class="phrase-tag">Decision Ready</p>
-				<h2>Turn data into your admission strategy.</h2>
-				<p>Compare outcomes, review cutoff trends, and plan your next move with clarity.</p>
-			</article>
-		</section>
-
-		<section class="stats-grid">
-			<article class="stat-item">
-				<div class="stat-label">Total Colleges Tracked</div>
-				<p class="stat-value">210</p>
-			</article>
-			<article class="stat-item">
-				<div class="stat-label">Top Prediction</div>
-				<p class="stat-value">RVCE</p>
-			</article>
-			<article class="stat-item">
-				<div class="stat-label">Admission Chance</div>
-				<p class="stat-value text-success">High</p>
-			</article>
-			<article class="stat-item">
-				<div class="stat-label">Placement Insight</div>
-				<p class="stat-value">12 LPA</p>
-			</article>
-		</section>
-
-		<section class="panel-card dashboard-chart-card mt-4">
-			<div class="dashboard-chart-header">
+<body class="gradient-bg">
+	<div class="app-shell">
+		<aside class="app-sidebar">
+			<div class="brand-wrap">
+				<div class="brand-icon">RR</div>
 				<div>
-					<h2 class="section-heading mb-2"><i class="bi bi-graph-up"></i>Cutoff Trend Chart</h2>
-					<p class="section-note mb-0">A quick view of year-wise KCET cutoff movement across top branches.</p>
-				</div>
-				<div class="chart-badges">
-					<span class="status-pill">2021 - 2024</span>
-					<span class="status-pill subtle">Animated trend view</span>
+					<div class="brand-title">RankRoute</div>
+					<div class="brand-subtitle">AI College Predictor</div>
 				</div>
 			</div>
-			<div class="dashboard-chart-shell mt-3">
-				<canvas id="cutoffChart"></canvas>
-			</div>
-		</section>
-	</main>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/js/script.js"></script>
+			<nav class="sidebar-nav">
+				<a class="nav-item active" href="/html/dashboard.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+				<a class="nav-item" href="/html/predictorpage.html"><i class="bi bi-search"></i>Predictor</a>
+				<a class="nav-item" href="/html/map.html"><i class="bi bi-map"></i>Map</a>
+				<a class="nav-item" href="/html/mocktest.html"><i class="bi bi-journal-check"></i>Exams</a>
+			</nav>
+
+			<div class="sidebar-footer">
+				<a class="nav-item" href="/html/login.html"><i class="bi bi-box-arrow-right"></i>Sign Out</a>
+			</div>
+		</aside>
+
+		<main class="content-area">
+			<!-- Top navbar -->
+			<header class="topbar">
+				<div class="topbar-left">
+					<button class="sidebar-toggle" aria-label="Toggle menu"><i class="bi bi-list"></i></button>
+					<nav class="top-nav">
+						<a href="/html/dashboard.html" class="top-link active">Dashboard</a>
+						<a href="/html/predictorpage.html" class="top-link">Predictor</a>
+						<a href="/html/map.html" class="top-link">Map</a>
+						<a href="/html/mocktest.html" class="top-link">Exams</a>
+					</nav>
+				</div>
+				<div class="topbar-right">
+					<button id="themeToggle" class="icon-btn" title="Toggle theme"><i class="bi bi-moon-stars"></i></button>
+
+					<div class="notif-wrap">
+					  <button id="notifBell" class="bell-btn" aria-haspopup="true" aria-expanded="false" title="Notifications">
+						<span class="bell-icon"><i class="bi bi-bell-fill"></i></span>
+						<span class="notif-badge" id="notifBadge" aria-hidden="true">3</span>
+					  </button>
+
+					  <div class="notif-panel shadow-sm" id="notifPanel" aria-hidden="true" role="dialog" aria-label="Notifications panel">
+						<div class="notif-panel-header">
+						  <strong>Notifications</strong>
+						  <div>
+						    <button id="markAllSeen" class="link-muted">Mark all as read</button>
+						    <a href="/html/notifications.html" class="link-muted ms-2">View all</a>
+						  </div>
+						</div>
+						<ul class="notif-list" id="notifList">
+						  <!-- notifications rendered here -->
+						</ul>
+					  </div>
+					</div>
+				</div>
+			</header>
+
+			<section class="page-head">
+				<div>
+					<h1 class="page-title" id="dashboardWelcome">Welcome Student</h1>
+					<p class="page-subtitle">Your personalized counseling dashboard.</p>
+				</div>
+				<div class="head-actions">
+					<button class="btn btn-primary btn-glow" id="exploreMapBtn">Explore Map</button>
+				</div>
+			</section>
+
+			<!-- Top stats -->
+			<section class="stats-grid mt-3">
+				<article class="stat-item glass">
+					<div class="stat-label">Total colleges analyzed</div>
+					<p class="stat-value" data-target="210">0</p>
+				</article>
+				<article class="stat-item glass">
+					<div class="stat-label">Predicted admission chance</div>
+					<p class="stat-value" id="admissionChance">High</p>
+				</article>
+				<article class="stat-item glass">
+					<div class="stat-label">Top recommended college</div>
+					<p class="stat-value" id="topCollege">RVCE</p>
+				</article>
+				<article class="stat-item glass">
+					<div class="stat-label">Placement insights</div>
+					<p class="stat-value">Avg 12 LPA</p>
+				</article>
+			</section>
+
+			<!-- Dashboard main grid -->
+			<div class="dashboard-grid mt-4">
+				<section class="panel-card dashboard-chart-card">
+					<div class="dashboard-chart-header">
+						<div>
+							<h3 class="section-heading"><i class="bi bi-graph-up"></i> Cutoff Trend</h3>
+							<p class="section-note">Year-wise cutoff movements (KEA / COMEDK sample)</p>
+						</div>
+						<div class="chart-badges">
+							<span class="status-pill">2021 - 2024</span>
+						</div>
+					</div>
+					<div class="dashboard-chart-shell mt-3">
+						<canvas id="cutoffChart"></canvas>
+					</div>
+				</section>
+
+				<aside class="panel-card exams-panel">
+					<div class="panel-head">
+						<h4>Top Engineering Entrance Exams (Karnataka)</h4>
+						<p class="subtle">Popular exams and application deadlines</p>
+					</div>
+					<div class="exams-grid" id="examsGrid">
+						<!-- exam cards inserted in HTML for accessibility -->
+						<article class="exam-card" data-exam="PESSAT">
+							<div class="exam-name">PESSAT</div>
+							<div class="exam-college">PES University</div>
+							<div class="exam-dates">Applications: Apr 1 - Jun 10</div>
+							<div class="exam-actions">
+								<button class="btn btn-sm btn-outline-primary apply-btn">Apply Now</button>
+								<button class="btn btn-sm btn-glass remind-btn">Remind Me</button>
+							</div>
+						</article>
+
+						<article class="exam-card" data-exam="COMEDK">
+							<div class="exam-name">COMEDK</div>
+							<div class="exam-college">Multiple</div>
+							<div class="exam-dates">Applications: May 5 - Jun 20</div>
+							<div class="exam-actions">
+								<button class="btn btn-sm btn-outline-primary apply-btn">Apply Now</button>
+								<button class="btn btn-sm btn-glass remind-btn">Remind Me</button>
+							</div>
+						</article>
+
+						<article class="exam-card" data-exam="RVU">
+							<div class="exam-name">RVU</div>
+							<div class="exam-college">RV University</div>
+							<div class="exam-dates">Applications: Jun 1 - Jul 12</div>
+							<div class="exam-actions">
+								<button class="btn btn-sm btn-outline-primary apply-btn">Apply Now</button>
+								<button class="btn btn-sm btn-glass remind-btn">Remind Me</button>
+							</div>
+						</article>
+
+						<article class="exam-card" data-exam="REVA">
+							<div class="exam-name">REVA</div>
+							<div class="exam-college">REVA University</div>
+							<div class="exam-dates">Applications: Jun 10 - Jul 25</div>
+							<div class="exam-actions">
+								<button class="btn btn-sm btn-outline-primary apply-btn">Apply Now</button>
+								<button class="btn btn-sm btn-glass remind-btn">Remind Me</button>
+							</div>
+						</article>
+
+						<article class="exam-card" data-exam="DSU">
+							<div class="exam-name">DSU</div>
+							<div class="exam-college">Dayananda Sagar</div>
+							<div class="exam-dates">Applications: Jul 1 - Aug 5</div>
+							<div class="exam-actions">
+								<button class="btn btn-sm btn-outline-primary apply-btn">Apply Now</button>
+								<button class="btn btn-sm btn-glass remind-btn">Remind Me</button>
+							</div>
+						</article>
+					</div>
+				</aside>
+
+				<section class="panel-card timeline-panel">
+					<h4>Upcoming Exams Timeline</h4>
+					<div class="timeline" id="upcomingTimeline">
+						<div class="timeline-item">
+							<div class="timeline-date">Apr</div>
+							<div class="timeline-content">PESSAT applications open</div>
+						</div>
+						<div class="timeline-item">
+							<div class="timeline-date">May</div>
+							<div class="timeline-content">COMEDK registration</div>
+						</div>
+						<div class="timeline-item">
+							<div class="timeline-date">Jun</div>
+							<div class="timeline-content">RVU & REVA deadlines</div>
+						</div>
+					</div>
+				</section>
+
+				<section class="panel-card ai-panel">
+					<h4>Recommended Exams</h4>
+					<div class="ai-list">
+						<div class="ai-card highlight">You have a good chance in PESSAT — strong fit for PES University</div>
+						<div class="ai-card">Consider COMEDK if you increase mock accuracy by 6%</div>
+					</div>
+				</section>
+
+				<section class="panel-card map-panel">
+					<h4>Colleges Map</h4>
+					<div id="dashboardMap" class="dashboard-map" aria-label="Colleges map"></div>
+					<div class="map-actions mt-2">
+						<button class="btn btn-sm btn-primary" id="openMapBtn">Explore Map</button>
+					</div>
+				</section>
+			</div>
+
+			<footer class="app-footer mt-4">© RankRoute • Smart decisions for admissions</footer>
+		</main>
+	</div>
+
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j8m0bGZbK3Vd0u/6Zm6/8I1QFQ3mZkW1rVx0z0A=" crossorigin=""></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="/js/script.js"></script>
 </body>
 </html>
