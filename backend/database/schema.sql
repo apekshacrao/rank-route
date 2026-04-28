@@ -103,9 +103,20 @@ CREATE TABLE IF NOT EXISTS leaderboard_scores (
     CHECK (time_taken_seconds >= 0)
 );
 
+-- Cutoff table indexes (performance-critical for predictions)
 CREATE INDEX IF NOT EXISTS idx_cutoffs_branch_category_year
     ON cutoffs(branch_id, category, year);
 
+CREATE INDEX IF NOT EXISTS idx_cutoffs_college_branch
+    ON cutoffs(college_id, branch_id);
+
+CREATE INDEX IF NOT EXISTS idx_cutoffs_cutoff_rank
+    ON cutoffs(cutoff_rank);
+
+CREATE INDEX IF NOT EXISTS idx_cutoffs_category_year
+    ON cutoffs(category, year);
+
+-- Prediction table indexes
 CREATE INDEX IF NOT EXISTS idx_predictions_user_created
     ON predictions(user_id, created_at DESC);
 
