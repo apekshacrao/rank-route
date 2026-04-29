@@ -931,59 +931,87 @@ function setupNotifications() {
 
 	// Use the same storage key as notifications page
 	const STORAGE_KEY = 'rr_notifications_v1';
-	let notifications = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-	if (!Array.isArray(notifications)) {
-		// Seed with official, student-relevant notifications only (government / exam)
-		const now = Date.now();
-		notifications = [
-			{
-				id: 1,
-				title: 'KCET counseling schedule released',
-				text: 'KEA has released the official counseling schedule. Check dates and deadlines.',
-				datetime: new Date(now - 2 * 3600 * 1000).toISOString(),
-				type: 'government',
-				priority: 'high',
-				read: false,
-			},
-			{
-				id: 2,
-				title: 'PESSAT registrations open',
-				text: 'PESSAT registration window is open. Apply before the deadline.',
-				datetime: new Date(now - 24 * 3600 * 1000).toISOString(),
-				type: 'exam',
-				priority: 'medium',
-				read: false,
-			},
-			{
-				id: 3,
-				title: 'COMEDK admit card available',
-				text: 'COMEDK admit cards have been released. Download from official portal.',
-				datetime: new Date(now - 3 * 24 * 3600 * 1000).toISOString(),
-				type: 'exam',
-				priority: 'high',
-				read: false,
-			}
-		];
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
-	}
-
-	// Add a KEA PSIT notification if not already present (small official alert)
-	const hasKeaPsit = notifications.some(n => (n.title || '').toLowerCase().includes('kea psit'));
-	if (!hasKeaPsit) {
-		const psitNotice = {
-			id: Date.now(),
-			title: 'KEA PSIT update',
-			text: 'Official KEA PSIT information is available — check the KEA portal for details.',
-			datetime: new Date().toISOString(),
-			type: 'government',
+	const officialCatalog = [
+		{
+			key: 'kea-exam-schedule',
+			title: 'KEA Exam Schedule',
+			text: 'Official KEA exam schedule has been released — check the KEA portal for detailed dates and instructions.',
+			type: 'exam',
 			priority: 'high',
+			offsetMs: 5 * 3600 * 1000,
+			legacyTitles: ['kea psit update'],
+		},
+		{
+			key: 'comedk-exam-schedule',
+			title: 'COMEDK Exam Schedule Released',
+			text: 'COMEDK UGET exam dates are announced. Check the official website for application and exam details.',
+			type: 'exam',
+			priority: 'high',
+			offsetMs: 5 * 3600 * 1000,
+		},
+		{
+			key: 'pessat-registrations-open',
+			title: 'PESSAT Registrations Open',
+			text: 'PESSAT registration is now open. Apply early to secure your slot.',
+			type: 'exam',
+			priority: 'high',
+			offsetMs: 24 * 3600 * 1000,
+		},
+		{
+			key: 'rvu-entrance-update',
+			title: 'RVU Entrance Test Update',
+			text: 'RV University entrance exam details updated. Check eligibility and schedule.',
+			type: 'exam',
+			priority: 'medium',
+			offsetMs: 2 * 24 * 3600 * 1000,
+		},
+		{
+			key: 'reva-cet-notification',
+			title: 'REVA CET Notification',
+			text: 'REVA CET exam schedule released. Visit official portal for details.',
+			type: 'exam',
+			priority: 'medium',
+			offsetMs: 3 * 24 * 3600 * 1000,
+		},
+		{
+			key: 'dsu-entrance-exam-info',
+			title: 'DSU Entrance Exam Info',
+			text: 'DSU entrance exam details available. Check dates and syllabus.',
+			type: 'exam',
+			priority: 'medium',
+			offsetMs: 4 * 24 * 3600 * 1000,
+		},
+	];
+	const now = Date.now();
+	const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+	const source = Array.isArray(stored) ? stored : [];
+	const notifications = officialCatalog.map((item, index) => {
+		const match = source.find((entry) => {
+			const title = String(entry?.title || '').trim().toLowerCase();
+			return title === item.title.toLowerCase() || item.legacyTitles?.includes(title);
+		});
+		if (match) {
+			return {
+				...match,
+				title: item.title,
+				text: item.text,
+				type: item.type,
+				priority: item.priority,
+				read: Boolean(match.read),
+				datetime: match.datetime || new Date(now - item.offsetMs).toISOString(),
+			};
+		}
+		return {
+			id: now + index + 1,
+			title: item.title,
+			text: item.text,
+			datetime: new Date(now - item.offsetMs).toISOString(),
+			type: item.type,
+			priority: item.priority,
 			read: false,
 		};
-		notifications.unshift(psitNotice);
-		// keep only recent 20 in storage
-		notifications = notifications.slice(0, 20);
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
-	}
+	});
+	localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
 
 	function updateBadge() {
 		// Show red badge ONLY if there are unread high-priority notifications

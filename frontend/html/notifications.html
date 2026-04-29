@@ -57,27 +57,94 @@
 
   function saveNotifications(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
 
-  function seedOfficialNotificationsIfEmpty(){
-    const cur = loadNotifications();
-    if (Array.isArray(cur) && cur.length > 0) return;
+  function syncOfficialNotifications(){
     const now = Date.now();
-    const sample = [
-      { id: now+1, title: 'KCET counseling schedule released', text: 'KEA released the counseling schedule. Check dates and option entry deadlines.', datetime: new Date(now - 2*3600*1000).toISOString(), type: 'government', priority: 'high', read: false },
-      { id: now+2, title: 'PESSAT registrations open', text: 'PESSAT registration window is open. Apply before the deadline.', datetime: new Date(now - 24*3600*1000).toISOString(), type: 'exam', priority: 'medium', read: false },
-      { id: now+3, title: 'COMEDK admit card available', text: 'COMEDK admit cards released. Download from official portal.', datetime: new Date(now - 3*24*3600*1000).toISOString(), type: 'exam', priority: 'high', read: false },
-      { id: now+4, title: 'Seat allotment results published', text: 'KEA published seat allotment results for round 1. Check your credentials.', datetime: new Date(now - 5*3600*1000).toISOString(), type: 'government', priority: 'high', read: false },
-      { id: now+5, title: 'Option entry deadline approaching', text: 'Option entry deadline for KCET counseling is in 48 hours. Submit preferences.', datetime: new Date(now - 12*3600*1000).toISOString(), type: 'government', priority: 'high', read: false },
-      { id: now+6, title: 'PESSAT result announcement', text: 'PESSAT results are expected soon. Keep your application ID ready.', datetime: new Date(now - 18*3600*1000).toISOString(), type: 'exam', priority: 'medium', read: false }
+    const catalog = [
+      {
+        legacyTitles: ['kea psit update'],
+        title: 'KEA Exam Schedule',
+        text: 'Official KEA exam schedule has been released — check the KEA portal for detailed dates and instructions.',
+        datetimeOffset: 5 * 3600 * 1000,
+        type: 'exam',
+        priority: 'high'
+      },
+      {
+        title: 'COMEDK Exam Schedule Released',
+        text: 'COMEDK UGET exam dates are announced. Check the official website for application and exam details.',
+        datetimeOffset: 5 * 3600 * 1000,
+        type: 'exam',
+        priority: 'high'
+      },
+      {
+        title: 'PESSAT Registrations Open',
+        text: 'PESSAT registration is now open. Apply early to secure your slot.',
+        datetimeOffset: 24 * 3600 * 1000,
+        type: 'exam',
+        priority: 'high'
+      },
+      {
+        title: 'RVU Entrance Test Update',
+        text: 'RV University entrance exam details updated. Check eligibility and schedule.',
+        datetimeOffset: 2 * 24 * 3600 * 1000,
+        type: 'exam',
+        priority: 'medium'
+      },
+      {
+        title: 'REVA CET Notification',
+        text: 'REVA CET exam schedule released. Visit official portal for details.',
+        datetimeOffset: 3 * 24 * 3600 * 1000,
+        type: 'exam',
+        priority: 'medium'
+      },
+      {
+        title: 'DSU Entrance Exam Info',
+        text: 'DSU entrance exam details available. Check dates and syllabus.',
+        datetimeOffset: 4 * 24 * 3600 * 1000,
+        type: 'exam',
+        priority: 'medium'
+      }
     ];
-    saveNotifications(sample);
+
+    const existing = loadNotifications();
+    const source = Array.isArray(existing) ? existing : [];
+    const next = catalog.map((item, index) => {
+      const match = source.find(entry => {
+        const title = String(entry?.title || '').trim().toLowerCase();
+        return title === item.title.toLowerCase() || (item.legacyTitles || []).includes(title);
+      });
+
+      if (match) {
+        return {
+          ...match,
+          title: item.title,
+          text: item.text,
+          type: item.type,
+          priority: item.priority,
+          read: Boolean(match.read),
+          datetime: match.datetime || new Date(now - item.datetimeOffset).toISOString()
+        };
+      }
+
+      return {
+        id: now + index + 1,
+        title: item.title,
+        text: item.text,
+        datetime: new Date(now - item.datetimeOffset).toISOString(),
+        type: item.type,
+        priority: item.priority,
+        read: false
+      };
+    });
+
+    saveNotifications(next);
   }
 
   function renderPage(){
     const list = loadNotifications();
     const container = document.getElementById('notificationsList');
     if(!container) return;
-    // Filter to allowed types (government, exam) and sort by datetime desc
-    const allowed = (list || []).filter(i => i && (i.type === 'government' || i.type === 'exam'))
+    // Filter to official exam notifications and sort by datetime desc
+    const allowed = (list || []).filter(i => i && i.type === 'exam')
         .sort((a,b) => new Date(b.datetime || b.date || 0) - new Date(a.datetime || a.date || 0))
         .slice(0, 7);
 
@@ -128,7 +195,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', ()=>{
-    seedOfficialNotificationsIfEmpty();
+    syncOfficialNotifications();
     document.getElementById('markAllPage')?.addEventListener('click', ()=>{ const list = loadNotifications(); list.forEach(x=>x.read=true); saveNotifications(list); renderPage(); });
     renderPage();
   });

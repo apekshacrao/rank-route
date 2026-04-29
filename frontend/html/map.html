@@ -25,8 +25,8 @@
 
 		<section class="map-hero-card">
 			<p class="eyebrow">AI + Location</p>
-			<h1>Explore Karnataka engineering colleges on an interactive map.</h1>
-			<p class="hero-copy">Filter by branch, search by college, and use your latest prediction to highlight nearby options with live distance context.</p>
+			<h1>Explore Karnataka engineering colleges with NIRF rankings.</h1>
+			<p class="hero-copy">Search by college or location, compare NIRF ranks, and focus on the best-ranked engineering campuses across the state.</p>
 			<div class="hero-stats">
 				<div class="hero-stat">
 					<span id="collegeCount">0</span>
@@ -34,11 +34,11 @@
 				</div>
 				<div class="hero-stat">
 					<span id="predictedCount">0</span>
-					<label>Predicted matches</label>
+					<label>Top ranked</label>
 				</div>
 				<div class="hero-stat">
-					<span id="distanceStatus">--</span>
-					<label>Distance mode</label>
+					<span id="distanceStatus">0</span>
+					<label>Visible now</label>
 				</div>
 			</div>
 		</section>
@@ -47,7 +47,7 @@
 			<div class="panel-heading">
 				<div>
 					<h2>College list</h2>
-					<p>Predictions stay pinned to the top and update with your current filters.</p>
+					<p>Colleges are sorted by NIRF rank, with top-ranked options pinned near the top.</p>
 				</div>
 				<div id="mapStatusPill" class="status-pill">Loading...</div>
 			</div>
@@ -58,30 +58,19 @@
 	<main class="map-main">
 		<header class="map-toolbar">
 			<div class="filters-grid">
-				<label class="filter-field">
-					<span>Branch</span>
-					<select id="branchFilter">
-						<option value="ALL">All branches</option>
-						<option value="CSE">CSE</option>
-						<option value="ISE">ISE</option>
-						<option value="ECE">ECE</option>
-						<option value="AIML">AIML</option>
-					</select>
-				</label>
-
-				<label class="filter-field">
-					<span>Rank input</span>
-					<input id="rankFilter" type="number" min="1" max="30000" value="4000" placeholder="Enter your KCET rank">
-				</label>
-
 				<label class="filter-field search-field">
 					<span>Location search</span>
 					<input id="locationSearch" type="search" placeholder="Search by college or area">
 				</label>
+
+				<label class="filter-field">
+					<span>Max NIRF rank</span>
+					<input id="rankFilter" type="number" min="1" max="500" value="999" placeholder="Optional rank filter">
+				</label>
 			</div>
 
 			<div class="toolbar-actions">
-				<button id="focusPredictedBtn" class="ghost-button" type="button">Focus predictions</button>
+				<button id="focusTopRankedBtn" class="ghost-button" type="button">Focus top ranked</button>
 				<button id="fitAllBtn" class="ghost-button" type="button">Fit all colleges</button>
 			</div>
 		</header>

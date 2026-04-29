@@ -256,10 +256,15 @@ select {
 }
 
 .college-card:hover,
-.college-card.is-active {
+.college-card.is-active,
+.college-card.is-hovered {
 	transform: translateY(-2px);
 	background: #ffffff;
 	border-color: #cfd8ef;
+}
+
+.college-card.is-top-ranked {
+	box-shadow: inset 0 0 0 1px rgba(32, 201, 151, 0.16);
 }
 
 .college-card.is-predicted {
@@ -277,6 +282,35 @@ select {
 	margin: 0;
 	font-size: 16px;
 	line-height: 1.25;
+}
+
+.college-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 5px 9px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 800;
+	line-height: 1;
+	background: #eef2fb;
+	color: #4b5d87;
+}
+
+.chip.predicted {
+	background: #e6f8ef;
+	color: #1d8b55;
+}
+
+.chip.top-ranked {
+	background: #e9efff;
+	color: #3550c5;
 }
 
 .badge-row {
@@ -312,6 +346,11 @@ select {
 	color: #b42330;
 }
 
+.mini-badge.top-ranked {
+	background: #e6f8ef;
+	color: #1d8b55;
+}
+
 .card-meta {
 	display: grid;
 	gap: 6px;
@@ -333,7 +372,7 @@ select {
 
 .filters-grid {
 	display: grid;
-	grid-template-columns: minmax(140px, 170px) minmax(190px, 1fr) minmax(220px, 1.5fr);
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	gap: 12px;
 	min-width: 0;
 }
@@ -350,7 +389,6 @@ select {
 	color: #dce7ff;
 }
 
-.filter-field select,
 .filter-field input[type="search"] {
 	width: 100%;
 	border-radius: 14px;
@@ -649,6 +687,10 @@ select {
 .map-pin.is-highlighted {
 	box-shadow: 0 14px 26px rgba(17, 27, 54, 0.24);
 	transform: rotate(-45deg) scale(1.08);
+}
+
+.map-pin.is-top-ranked {
+	box-shadow: 0 0 0 5px rgba(32, 201, 151, 0.16), 0 14px 26px rgba(17, 27, 54, 0.24);
 }
 
 .map-pin-dot {
