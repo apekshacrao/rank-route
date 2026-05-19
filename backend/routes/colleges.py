@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from services.college_service import build_college_catalog
+from services.college_service import build_college_catalog, load_nearby_facilities
 
 colleges_bp = Blueprint("colleges", __name__)
 
@@ -9,3 +9,9 @@ colleges_bp = Blueprint("colleges", __name__)
 def list_colleges():
 	colleges = build_college_catalog()
 	return jsonify({"count": len(colleges), "colleges": colleges})
+
+
+@colleges_bp.get("/nearby-facilities")
+def list_nearby_facilities():
+	facilities = load_nearby_facilities()
+	return jsonify({"count": len(facilities), "facilities": facilities})

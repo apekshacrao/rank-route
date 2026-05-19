@@ -242,6 +242,86 @@ select {
 	padding-right: 4px;
 }
 
+.map-facility-panel {
+	max-height: 36vh;
+	overflow: auto;
+}
+
+.facility-panel-content {
+	display: grid;
+	gap: 10px;
+	font-size: 13px;
+	color: var(--map-muted);
+}
+
+.facility-panel-header h3 {
+	margin: 0;
+	font: 700 16px/1.2 "Space Grotesk", sans-serif;
+	color: #1a2753;
+}
+
+.facility-panel-header p {
+	margin: 6px 0 10px;
+	color: #657394;
+}
+
+.facility-score {
+	display: inline-flex;
+	padding: 6px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 800;
+	background: #e9efff;
+	color: #2b4db2;
+	border: 1px solid #d7e2ff;
+}
+
+.facility-panel-groups {
+	display: grid;
+	gap: 8px;
+}
+
+.facility-group {
+	border: 1px solid #deE6f7;
+	border-radius: 12px;
+	padding: 10px;
+	background: #fbfdff;
+	transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.facility-group:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 8px 16px rgba(21, 38, 84, 0.08);
+}
+
+.facility-title {
+	font-size: 12px;
+	font-weight: 800;
+	color: #1f2d5c;
+	margin-bottom: 6px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+
+.facility-group ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 5px;
+	font-size: 13px;
+	color: #4e5f89;
+}
+
+.facility-empty {
+	padding: 12px;
+	border-radius: 12px;
+	border: 1px dashed #cfd9f1;
+	background: #f9fbff;
+	font-weight: 600;
+	color: #657394;
+}
+
 .college-card {
 	border: 1px solid var(--map-border);
 	border-radius: 18px;
@@ -649,10 +729,56 @@ select {
 	color: #fff;
 }
 
+.popup-button.directions {
+	background: linear-gradient(120deg, #1d5ef5 0%, #2a84ff 52%, #1ac7c2 100%);
+	color: #ffffff;
+	box-shadow: 0 12px 22px rgba(29, 94, 245, 0.26);
+	transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+	gap: 8px;
+}
+
+.popup-button.directions:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 16px 26px rgba(29, 94, 245, 0.32);
+	filter: saturate(1.05);
+}
+
 .popup-button.ghost {
 	background: #eef2fb;
 	color: #1a2753;
 	border: 1px solid #dbe3f5;
+}
+
+.college-card-actions {
+	margin-top: 12px;
+	display: flex;
+	justify-content: flex-start;
+}
+
+.direction-btn {
+	border: 0;
+	border-radius: 999px;
+	padding: 10px 14px;
+	font-weight: 800;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: #ffffff;
+	background: linear-gradient(120deg, #1d5ef5 0%, #2a84ff 52%, #1ac7c2 100%);
+	box-shadow: 0 10px 20px rgba(29, 94, 245, 0.24);
+	transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.direction-btn:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 14px 24px rgba(29, 94, 245, 0.3);
+	filter: saturate(1.06);
+}
+
+.direction-btn:active {
+	transform: translateY(0);
+	box-shadow: 0 8px 14px rgba(29, 94, 245, 0.24);
 }
 
 .map-marker-icon {
@@ -726,6 +852,26 @@ select {
 	position: relative;
 }
 
+.facility-marker-icon {
+	display: grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: #ffffff;
+	border: 1px solid #d6e0f7;
+	box-shadow: 0 8px 18px rgba(17, 27, 54, 0.18);
+	font-size: 15px;
+}
+
+.facility-popup {
+	min-width: 170px;
+	font-size: 13px;
+	color: #1b2a54;
+	display: grid;
+	gap: 4px;
+}
+
 .empty-state {
 	padding: 18px;
 	border-radius: 16px;
@@ -777,6 +923,10 @@ select {
 	.college-list {
 		max-height: 320px;
 	}
+
+	.map-facility-panel {
+		max-height: 300px;
+	}
 }
 
 @media (max-width: 860px) {
@@ -817,4 +967,131 @@ select {
 	.map-sidebar {
 		padding: 18px;
 	}
+
+	.direction-btn {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+body.map-page {
+	background:
+		radial-gradient(circle at 12% 12%, rgba(123,97,255,0.15), transparent 25%),
+		radial-gradient(circle at 88% 10%, rgba(32,201,151,0.09), transparent 24%),
+		linear-gradient(180deg, #020617 0%, #071028 62%, #0b1328 100%);
+	color: #e5eefc;
+}
+
+body.map-page::before {
+	opacity: 0.25;
+	background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+}
+
+body.map-page .map-sidebar,
+body.map-page .map-main,
+body.map-page .map-hero-card,
+body.map-page .map-panel {
+	background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+	border-color: rgba(255,255,255,0.08);
+	box-shadow: 0 24px 56px rgba(2,6,20,0.56);
+	backdrop-filter: blur(16px) saturate(120%);
+}
+
+body.map-page .map-brand-subtitle,
+body.map-page .hero-copy,
+body.map-page .panel-heading p,
+body.map-page .facility-panel-content,
+body.map-page .card-meta,
+body.map-page .popup-meta,
+body.map-page .map-info-window .meta,
+body.map-page .empty-state,
+body.map-page .loading-overlay p,
+body.map-page .map-fallback p,
+body.map-page .facility-group ul {
+	color: rgba(226,236,255,0.74);
+}
+
+body.map-page .map-hero-card h1,
+body.map-page .panel-heading h2,
+body.map-page .section-title,
+body.map-page .facility-panel-header h3,
+body.map-page .college-card h3,
+body.map-page .map-info-window h3,
+body.map-page .popup-card h3,
+body.map-page .map-info-window .info-row strong,
+body.map-page .popup-row strong,
+body.map-page .rank-control strong,
+body.map-page .card-meta strong,
+body.map-page .map-brand-title {
+	color: #f8fbff;
+}
+
+body.map-page .eyebrow {
+	color: #8ea2ff;
+}
+
+body.map-page .status-pill,
+body.map-page .facility-score,
+body.map-page .chip,
+body.map-page .mini-badge,
+body.map-page .hero-stat,
+body.map-page .empty-state,
+body.map-page .facility-group,
+body.map-page .college-card,
+body.map-page .ghost-button,
+body.map-page .filter-field input[type="search"],
+body.map-page .filter-field input[type="number"],
+body.map-page .rank-control,
+body.map-page .map-stage,
+body.map-page .map-fallback,
+body.map-page .loading-overlay,
+body.map-page .facility-marker-icon,
+body.map-page .popup-button.ghost,
+body.map-page .map-info-window .secondary-link {
+	background: rgba(255,255,255,0.04);
+	border-color: rgba(255,255,255,0.08);
+	color: #eaf1ff;
+}
+
+body.map-page .college-card:hover,
+body.map-page .college-card.is-active,
+body.map-page .college-card.is-hovered,
+body.map-page .facility-group:hover,
+body.map-page .ghost-button:hover {
+	background: rgba(123,97,255,0.08);
+	border-color: rgba(123,97,255,0.2);
+	box-shadow: 0 18px 34px rgba(2,6,20,0.32);
+}
+
+body.map-page .map-stage {
+	background:
+		radial-gradient(circle at 20% 10%, rgba(123,97,255,0.08), transparent 24%),
+		radial-gradient(circle at 90% 0%, rgba(32,201,151,0.05), transparent 20%),
+		linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+}
+
+body.map-page .leaflet-container {
+	background: #0b1328;
+	color: #eaf1ff;
+}
+
+body.map-page .leaflet-control-container .leaflet-bar,
+body.map-page .leaflet-control-zoom,
+body.map-page .leaflet-popup-content-wrapper,
+body.map-page .leaflet-popup-tip {
+	background: rgba(8,14,34,0.96);
+	color: #eef4ff;
+	border-color: rgba(255,255,255,0.08);
+}
+
+body.map-page .leaflet-control-zoom a,
+body.map-page .leaflet-control-attribution {
+	color: #d3def7;
+}
+
+body.map-page .map-info-window .directions-link,
+body.map-page .popup-button.primary,
+body.map-page .popup-button.directions,
+body.map-page .direction-btn {
+	box-shadow: 0 14px 28px rgba(29,94,245,0.24);
 }

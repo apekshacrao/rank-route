@@ -1,0 +1,136 @@
+{
+  "RV College of Engineering": {
+    "pgs": [
+      { "name": "Sai Comfort PG", "distance": "0.8 km" },
+      { "name": "Global Boys Hostel", "distance": "1.1 km" }
+    ],
+    "metro": [
+      { "name": "Mysore Road Metro", "distance": "2.4 km" }
+    ],
+    "food": [
+      { "name": "Udupi Cafe", "distance": "300 m" },
+      { "name": "CTR Express", "distance": "1.0 km" }
+    ],
+    "hospital": [
+      { "name": "BGS Hospital", "distance": "2.1 km" }
+    ],
+    "bus": [
+      { "name": "RVCE Bus Stop", "distance": "200 m" }
+    ]
+  },
+  "BMS College of Engineering": {
+    "pgs": [
+      { "name": "Shanthi Ladies PG", "distance": "650 m" }
+    ],
+    "metro": [
+      { "name": "National College Metro", "distance": "1.4 km" }
+    ],
+    "food": [
+      { "name": "Vidyarthi Bhavan", "distance": "900 m" }
+    ],
+    "hospital": [
+      { "name": "Apollo Specialty", "distance": "2.3 km" }
+    ],
+    "bus": [
+      { "name": "Basavanagudi Bus Stop", "distance": "300 m" }
+    ]
+  },
+  "PES University": {
+    "pgs": [
+      { "name": "Lakshmi PG", "distance": "550 m" }
+    ],
+    "metro": [
+      { "name": "Banashankari Metro", "distance": "1.6 km" }
+    ],
+    "food": [
+      { "name": "Rotti Mane", "distance": "450 m" }
+    ],
+    "hospital": [
+      { "name": "Sagar Hospitals", "distance": "2.0 km" }
+    ],
+    "bus": [
+      { "name": "PESIT Bus Stop", "distance": "180 m" }
+    ]
+  },
+  "M S Ramaiah Institute of Technology": {
+    "pgs": [
+      { "name": "MSR Student PG", "distance": "400 m" }
+    ],
+    "metro": [
+      { "name": "Sandal Soap Factory Metro", "distance": "1.9 km" }
+    ],
+    "food": [
+      { "name": "Ramaiah Canteen Hub", "distance": "250 m" }
+    ],
+    "hospital": [
+      { "name": "Ramaiah Memorial Hospital", "distance": "700 m" }
+    ],
+    "bus": [
+      { "name": "MSRIT Main Gate Stop", "distance": "150 m" }
+    ]
+  },
+  "Dayananda Sagar College of Engineering": {
+    "pgs": [
+      { "name": "JP Nagar Scholars PG", "distance": "700 m" }
+    ],
+    "metro": [
+      { "name": "Yelachenahalli Metro", "distance": "1.8 km" }
+    ],
+    "food": [
+      { "name": "Anand Darshini", "distance": "500 m" }
+    ],
+    "hospital": [
+      { "name": "Rajshekar Hospital", "distance": "1.5 km" }
+    ],
+    "bus": [
+      { "name": "DSCE Bus Bay", "distance": "220 m" }
+    ]
+  },
+  "NITK Surathkal": {
+    "pgs": [
+      { "name": "Surathkal Seaside PG", "distance": "1.2 km" }
+    ],
+    "metro": [],
+    "food": [
+      { "name": "Beachside Bites", "distance": "700 m" }
+    ],
+    "hospital": [
+      { "name": "KMC Hospital Surathkal", "distance": "3.0 km" }
+    ],
+    "bus": [
+      { "name": "NITK Gate Bus Stop", "distance": "350 m" }
+    ]
+  },
+  "Manipal Institute of Technology": {
+    "pgs": [
+      { "name": "MIT Campus Residency", "distance": "600 m" }
+    ],
+    "metro": [],
+    "food": [
+      { "name": "Dollops Food Court", "distance": "250 m" }
+    ],
+    "hospital": [
+      { "name": "KMC Manipal", "distance": "1.4 km" }
+    ],
+    "bus": [
+      { "name": "MIT Main Bus Stop", "distance": "230 m" }
+    ]
+  },
+  "JSS Academy of Technical Education, Bengaluru": {
+    "pgs": [
+      { "name": "JSS Student Nest", "distance": "900 m" }
+    ],
+    "metro": [
+      { "name": "Kengeri Metro", "distance": "2.2 km" }
+    ],
+    "food": [
+      { "name": "Kengeri Tiffin Hub", "distance": "500 m" }
+    ],
+    "hospital": [
+      { "name": "Rajarajeshwari Hospital", "distance": "1.8 km" }
+    ],
+    "bus": [
+      { "name": "JSSATE Bus Point", "distance": "240 m" }
+    ]
+  }
+}

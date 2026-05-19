@@ -1,7 +1,9 @@
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL = window.location.origin || "http://127.0.0.1:5000";
+const FACILITIES_API_URL = `${API_BASE_URL}/nearby-facilities`;
 const SUBJECT_ANALYSIS_STORAGE_KEY = "kcet_subject_scores";
 const SUBJECT_TARGET_SCORE = 85;
 const LAST_PREDICTION_STORAGE_KEY = "rankroute_last_prediction";
+const DEFAULT_USER_LOCATION = { lat: 12.9716, lng: 77.5946, source: "Bangalore" };
 
 let subjectScoreChartInstance = null;
 let subjectGapChartInstance = null;
@@ -10,6 +12,8 @@ let dashboardMap = null;
 let dashboardMarkerLayer = null;
 let collegesData = [];
 let userLocation = null; // {lat, lng}
+let locationErrorShown = false;
+let facilitiesByCollege = {};
 
 function getSmoothChartAnimationOptions() {
  	return {
@@ -55,7 +59,6 @@ function renderPredictionTable(predictions) {
 		return "<div class='alert alert-warning'>No colleges found for your inputs.</div>";
 	}
 
-	// Build card-based UI for predictions
 	const cards = predictions.map((item, idx) => {
 		const collegeName = item.college || item.college_name || "Unknown College";
 		const branch = item.branch || '-';
@@ -71,12 +74,16 @@ function renderPredictionTable(predictions) {
 						<div class="pred-meta">${escapeHtml(branch)} • Cutoff: ${escapeHtml(String(cutoffValue))}</div>
 						<div class="pred-chance ${chanceClass}">${escapeHtml(chanceValue)}</div>
 						<div class="pred-distance" id="distance-${idx}">Calculating distance...</div>
-						<div class="pred-facilities" id="fac-${idx}"></div>
+						<div class="pred-convenience" id="score-${idx}"></div>
+						<details class="facility-accordion" open>
+							<summary>Nearby facilities</summary>
+							<div class="pred-facilities" id="fac-${idx}"></div>
+						</details>
 					</div>
 					<div class="pred-map">
 						<div id="miniMap-${idx}" class="mini-map"></div>
 						<div class="pred-actions mt-2">
-							<button class="btn btn-sm btn-outline-primary view-dir" data-lat="${item.latitude || ''}" data-lng="${item.longitude || ''}">View Directions</button>
+							<button class="direction-btn view-dir" data-pred-index="${idx}" data-lat="${item.latitude || ''}" data-lng="${item.longitude || ''}" aria-label="Show directions to ${escapeHtml(collegeName)}"><i class="bi bi-sign-turn-right-fill" aria-hidden="true"></i><span>Show Directions</span></button>
 						</div>
 					</div>
 				</div>
@@ -84,16 +91,8 @@ function renderPredictionTable(predictions) {
 		`;
 	}).join('');
 
-	// After rendering, initialize mini-maps and distance calculations
 	setTimeout(() => {
-		// ensure collegesData loaded
-		if (!collegesData.length) {
-			loadCollegesData().then(() => {
-				enrichPredictionCards(predictions);
-			}).catch(() => enrichPredictionCards(predictions));
-		} else {
-			enrichPredictionCards(predictions);
-		}
+		Promise.allSettled([loadNearbyFacilities(), loadCollegesData()]).finally(() => enrichPredictionCards(predictions));
 	}, 50);
 
 	return `<div class="predictions-list">${cards}</div>`;
@@ -105,76 +104,219 @@ function escapeHtml(text) {
 	}[s]));
 }
 
+function normalizeCollegeName(value) {
+	return String(value || "").trim().toLowerCase();
+}
+
+function parseDistanceToKm(distanceText) {
+	const value = String(distanceText || "").trim().toLowerCase();
+	if (!value) {
+		return null;
+	}
+	if (value.endsWith("km")) {
+		const km = Number.parseFloat(value.replace("km", "").trim());
+		return Number.isFinite(km) ? km : null;
+	}
+	if (value.endsWith("m")) {
+		const meters = Number.parseFloat(value.replace("m", "").trim());
+		return Number.isFinite(meters) ? meters / 1000 : null;
+	}
+	return null;
+}
+
+async function loadNearbyFacilities() {
+	if (Object.keys(facilitiesByCollege).length) {
+		return facilitiesByCollege;
+	}
+
+	const response = await fetch(FACILITIES_API_URL, { cache: "no-store" });
+	if (!response.ok) {
+		throw new Error("Failed to load nearby facilities.");
+	}
+
+	const data = await response.json();
+	const source = data?.facilities || {};
+	facilitiesByCollege = Object.fromEntries(
+		Object.entries(source).map(([key, value]) => [normalizeCollegeName(key), value])
+	);
+	return facilitiesByCollege;
+}
+
+async function ensureUserLocation() {
+	if (userLocation) {
+		return userLocation;
+	}
+
+	try {
+		userLocation = await getUserLocation();
+		return userLocation;
+	} catch (_error) {
+		if (!locationErrorShown) {
+			showToast("Using Bangalore as a fallback for directions.");
+			locationErrorShown = true;
+		}
+		userLocation = { lat: DEFAULT_USER_LOCATION.lat, lng: DEFAULT_USER_LOCATION.lng };
+		return userLocation;
+	}
+}
+
+function getFacilityDataForCollege(name) {
+	const normalized = normalizeCollegeName(name);
+	return facilitiesByCollege[normalized] || null;
+}
+
+function renderFacilityGroup(icon, label, items) {
+	if (!Array.isArray(items) || !items.length) {
+		return "";
+	}
+
+	const list = items
+		.slice(0, 3)
+		.map((entry) => `<li>${escapeHtml(entry.name || "Unknown")} - ${escapeHtml(entry.distance || "N/A")}</li>`)
+		.join("");
+
+	return `
+		<div class="facility-group">
+			<div class="facility-title">${icon} ${label}</div>
+			<ul>${list}</ul>
+		</div>
+	`;
+}
+
+function computeConvenienceScore(facilities) {
+	if (!facilities || typeof facilities !== "object") {
+		return null;
+	}
+
+	const weights = {
+		pgs: 2.2,
+		metro: 2.2,
+		food: 1.8,
+		hospital: 2.0,
+		bus: 1.8,
+	};
+
+	let weightedSum = 0;
+	let maxWeighted = 0;
+	Object.entries(weights).forEach(([key, weight]) => {
+		const entries = Array.isArray(facilities[key]) ? facilities[key] : [];
+		maxWeighted += weight;
+		if (!entries.length) {
+			return;
+		}
+
+		const nearest = entries
+			.map((entry) => parseDistanceToKm(entry.distance))
+			.filter((distance) => Number.isFinite(distance))
+			.sort((a, b) => a - b)[0];
+
+		const proximityFactor = Number.isFinite(nearest)
+			? Math.max(0.35, 1 - Math.min(nearest, 5) / 6)
+			: 0.62;
+		weightedSum += weight * proximityFactor;
+	});
+
+	if (!maxWeighted) {
+		return null;
+	}
+
+	const score = (weightedSum / maxWeighted) * 10;
+	return Math.max(0, Math.min(10, score));
+}
+
 function enrichPredictionCards(predictions) {
 	predictions.forEach((item, idx) => {
 		const name = item.college || item.college_name;
 		const col = findCollegeByName(name);
+		const coords = getCoordinatesForCollege(item, col);
+		const directionButton = document.querySelector(`.view-dir[data-pred-index="${idx}"]`);
+		if (directionButton && coords) {
+			directionButton.dataset.lat = String(coords.lat);
+			directionButton.dataset.lng = String(coords.lng);
+		}
 		// distance
 		computeAndShowDistance(idx, col, item);
 		// facilities
-		showFacilities(idx, col);
+		showFacilities(idx, name);
 		// mini map
 		initMiniMap(idx, col || item);
 	});
 
 	// Wire up directions buttons
 	document.querySelectorAll('.view-dir').forEach((btn) => {
-		btn.addEventListener('click', (e) => {
+		btn.addEventListener('click', async () => {
 			const lat = btn.dataset.lat;
 			const lng = btn.dataset.lng;
 			if (!lat || !lng) {
-				showToast('Coordinates not available for this college');
+				showToast('Coordinates not available for this college.');
 				return;
 			}
-			const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-			window.open(url, '_blank');
+			const origin = await ensureUserLocation();
+			const url = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${lat},${lng}&travelmode=driving`;
+			window.location.href = url;
 		});
 	});
 }
 
 function findCollegeByName(name) {
 	if (!name || !collegesData.length) return null;
-	return collegesData.find(c => (c.name || c.college_name || '').toLowerCase().includes(String(name).toLowerCase()));
+	const normalized = normalizeCollegeName(name);
+	return collegesData.find((c) => normalizeCollegeName(c.name || c.college_name) === normalized)
+		|| collegesData.find((c) => normalizeCollegeName(c.name || c.college_name).includes(normalized));
+}
+
+function getCoordinatesForCollege(item, college) {
+	const lat = Number(item.latitude || item.lat || college?.latitude || college?.lat);
+	const lng = Number(item.longitude || item.lng || college?.longitude || college?.lng);
+	if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+		return null;
+	}
+	return { lat, lng };
 }
 
 function computeAndShowDistance(idx, college, item) {
 	const el = document.getElementById(`distance-${idx}`);
 	if (!el) return;
-	if (!userLocation) {
-		getUserLocation().then((loc) => {
-			userLocation = loc;
-			computeAndShowDistance(idx, college, item);
-		}).catch(() => {
-			userLocation = { lat: 12.9715987, lng: 77.5945627 }; // Bangalore fallback
-			computeAndShowDistance(idx, college, item);
-		});
-		return;
-	}
 
-	const lat = (item.latitude || (college && college.latitude)) || null;
-	const lng = (item.longitude || (college && college.longitude)) || null;
-	if (!lat || !lng) {
+	const coords = getCoordinatesForCollege(item, college);
+	if (!coords) {
 		el.textContent = 'Distance: N/A';
 		return;
 	}
-	const d = haversineDistance(userLocation.lat, userLocation.lng, Number(lat), Number(lng));
-	el.textContent = `${d.toFixed(1)} km away from your location`;
+
+	ensureUserLocation().then((origin) => {
+		const d = haversineDistance(origin.lat, origin.lng, coords.lat, coords.lng);
+		el.textContent = `${d.toFixed(1)} km away`;
+	});
 }
 
-function showFacilities(idx, college) {
+function showFacilities(idx, collegeName) {
 	const container = document.getElementById(`fac-${idx}`);
+	const scoreEl = document.getElementById(`score-${idx}`);
 	if (!container) return;
-	if (!college || !college.nearby) {
-		container.innerHTML = '<small class="text-muted">No nearby facilities data</small>';
+	const facilities = getFacilityDataForCollege(collegeName);
+	if (!facilities) {
+		container.innerHTML = '<div class="facility-empty">Nearby facilities data not available</div>';
+		if (scoreEl) {
+			scoreEl.textContent = "Convenience Score: N/A";
+		}
 		return;
 	}
-	const nearby = college.nearby;
-	const icons = [];
-	if (nearby.malls && nearby.malls.length) icons.push(`<span title="Malls">🛍️ ${nearby.malls[0]}</span>`);
-	if (nearby.bus_stops && nearby.bus_stops.length) icons.push(`<span title="Bus stop">🚌 ${nearby.bus_stops[0]}</span>`);
-	if (nearby.metro && nearby.metro.length) icons.push(`<span title="Metro">🚇 ${nearby.metro[0]}</span>`);
-	if (nearby.hospitals && nearby.hospitals.length) icons.push(`<span title="Hospital">🏥 ${nearby.hospitals[0]}</span>`);
-	container.innerHTML = icons.join(' • ');
+
+	const html = [
+		renderFacilityGroup("🏠", "PGs Nearby", facilities.pgs),
+		renderFacilityGroup("🚇", "Metro", facilities.metro),
+		renderFacilityGroup("🚌", "Bus Stops", facilities.bus),
+		renderFacilityGroup("🍔", "Food", facilities.food),
+		renderFacilityGroup("🏥", "Hospitals", facilities.hospital),
+	].filter(Boolean).join("");
+
+	container.innerHTML = html || '<div class="facility-empty">Nearby facilities data not available</div>';
+
+	const score = computeConvenienceScore(facilities);
+	if (scoreEl) {
+		scoreEl.textContent = Number.isFinite(score) ? `Convenience Score: ${score.toFixed(1)}/10` : "Convenience Score: N/A";
+	}
 }
 
 function initMiniMap(idx, college) {
@@ -387,7 +529,7 @@ async function handleSignup(event) {
 	setStoredUser(data.user);
 	status.innerHTML = "<div class='alert alert-success'>Account created. Redirecting to dashboard...</div>";
 	setTimeout(() => {
-		window.location.href = "/html/dashboard.html";
+		window.location.href = "/dashboard";
 	}, 700);
 }
 
@@ -415,7 +557,7 @@ async function handleLogin(event) {
 	setStoredUser(data.user);
 	status.innerHTML = "<div class='alert alert-success'>Login successful. Redirecting...</div>";
 	setTimeout(() => {
-		window.location.href = "/html/dashboard.html";
+		window.location.href = "/dashboard";
 	}, 700);
 }
 
@@ -1028,10 +1170,52 @@ function setupNotifications() {
 	// update badge on load
 	updateBadge();
 
-	// Clicking the bell now redirects to the notifications page (full view)
+	const panel = document.getElementById('notifPanel');
+	const listEl = document.getElementById('notifList');
+	const markAllBtn = document.getElementById('markAllSeen');
+
+	function renderPanel() {
+		if (!listEl) return;
+		listEl.innerHTML = notifications.map((n) => {
+			const time = new Date(n.datetime).toLocaleString();
+			return `
+				<li class="notif-item ${n.read ? '' : 'new'}" data-id="${n.id}">
+					<div>
+						<div class="notif-row-title">${escapeHtml(n.title)}</div>
+						<div class="notif-row-text">${escapeHtml(n.text)}</div>
+						<div class="notif-row-meta">${escapeHtml(time)}</div>
+					</div>
+					<div style="margin-left:8px;flex-shrink:0">
+						${n.priority === 'high' ? '<span class="type-indicator type-exam" title="High priority"></span>' : ''}
+					</div>
+				</li>
+			`;
+		}).join('');
+	}
+
+	// Toggle the dropdown panel and render content
 	bell.addEventListener('click', (ev) => {
-		window.location.href = '/html/notifications.html';
+		if (!panel) return window.location.href = '/notifications';
+		const isOpen = panel.classList.contains('open') || panel.getAttribute('aria-hidden') === 'false';
+		if (isOpen) {
+			panel.classList.remove('open');
+			panel.setAttribute('aria-hidden', 'true');
+		} else {
+			renderPanel();
+			panel.classList.add('open');
+			panel.setAttribute('aria-hidden', 'false');
+		}
 	});
+
+	// mark all as read
+	if (markAllBtn) {
+		markAllBtn.addEventListener('click', () => {
+			notifications.forEach(n => n.read = true);
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+			updateBadge();
+			renderPanel();
+		});
+	}
 }
 
 function showToast(message = '', timeout = 2200) {
@@ -1050,7 +1234,7 @@ function setupExamButtons() {
 			const card = btn.closest('.exam-card');
 			const exam = card?.dataset?.exam || 'exam';
 			// open apply page — placeholder
-			window.open('/html/predictorpage.html', '_blank');
+			window.location.href = '/predictor';
 			showToast(`Opening application page for ${exam}`);
 		});
 	});
@@ -1093,6 +1277,27 @@ function setupButtonRipples() {
 	});
 }
 
+/* ----------------- Scroll animations (IntersectionObserver) ----------------- */
+function setupScrollAnimations() {
+	const observer = new IntersectionObserver((entries) => {
+		entries.forEach((entry) => {
+			if (entry.isIntersecting) {
+				entry.target.classList.add('in-view');
+				// trigger counters when stats grid is visible
+				if (entry.target.closest && entry.target.closest('.stats-grid')) {
+					animateCounters();
+				}
+				observer.unobserve(entry.target);
+			}
+		});
+	}, { threshold: 0.12 });
+
+	document.querySelectorAll('.panel-card, .stat-item, .phrase-card, .exam-card, .resource-card, .prediction-card, .dashboard-chart-card').forEach((el) => {
+		el.classList.add('fade-in');
+		observer.observe(el);
+	});
+}
+
 /* ----------------- Initialization ----------------- */
 document.addEventListener("DOMContentLoaded", () => {
 	setupForms();
@@ -1102,16 +1307,18 @@ document.addEventListener("DOMContentLoaded", () => {
 	renderCutoffChart();
 	setupSubjectAnalysis();
 	renderAIPredictorPlaceholder();
+	// counters will run when stats enter viewport; call once immediately for desktop
 	animateCounters();
 	setupNotifications();
 	setupExamButtons();
 	setupThemeToggle();
 	setupButtonRipples();
+	setupScrollAnimations();
 
 	// initialize dashboard map if present
 	try { initDashboardMap(); } catch (e) { /* ignore if leaflet missing */ }
 
 	// map / explore buttons
-	document.getElementById('exploreMapBtn')?.addEventListener('click', () => window.location.href = '/html/map.html');
-	document.getElementById('openMapBtn')?.addEventListener('click', () => window.location.href = '/html/map.html');
+	document.getElementById('exploreMapBtn')?.addEventListener('click', () => window.location.href = '/map');
+	document.getElementById('openMapBtn')?.addEventListener('click', () => window.location.href = '/map');
 });

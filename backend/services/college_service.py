@@ -6,6 +6,7 @@ from pathlib import Path
 
 COLLEGE_LOCATIONS_FILE = Path(__file__).resolve().parent.parent / "data" / "college_locations.json"
 COLLEGE_CUTOFFS_FILE = Path(__file__).resolve().parent.parent / "data" / "dataset.csv"
+NEARBY_FACILITIES_FILE = Path(__file__).resolve().parent.parent / "data" / "nearby_facilities.json"
 
 
 @lru_cache(maxsize=1)
@@ -51,10 +52,30 @@ def load_college_cutoff_rows() -> list[dict]:
 	return rows
 
 
+@lru_cache(maxsize=1)
+def load_nearby_facilities() -> dict[str, dict]:
+	"""Load nearby facilities by college name (normalized to lowercase)."""
+	if not NEARBY_FACILITIES_FILE.exists():
+		return {}
+
+	with NEARBY_FACILITIES_FILE.open("r", encoding="utf-8") as file:
+		raw_data = json.load(file)
+
+	facilities: dict[str, dict] = {}
+	for college_name, details in raw_data.items():
+		normalized = str(college_name or "").strip().lower()
+		if not normalized or not isinstance(details, dict):
+			continue
+		facilities[normalized] = details
+
+	return facilities
+
+
 def build_college_catalog() -> list[dict]:
 	"""Merge cutoff data with coordinates for the interactive map."""
 	cutoff_rows = load_college_cutoff_rows()
 	locations = load_college_locations()
+	nearby_facilities = load_nearby_facilities()
 	colleges_by_name: dict[str, dict] = {}
 
 	for row in cutoff_rows:
@@ -79,6 +100,7 @@ def build_college_catalog() -> list[dict]:
 				"cutoff": None,
 				"cutoffs": {},
 				"branch_cutoffs": {},
+				"nearby_facilities": nearby_facilities.get(college_name.lower(), {}),
 			},
 		)
 

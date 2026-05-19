@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect, request
 from flask_cors import CORS
 
 from database.db import init_db_for_app
@@ -35,6 +35,34 @@ def create_app() -> Flask:
     app.register_blueprint(mocktest_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(predictions_bp)
+
+    def _serve_page(page_name: str):
+        return app.send_static_file(f"html/{page_name}")
+
+    page_routes = {
+        "index.html": ("/",),
+        "login.html": ("/login",),
+        "signup.html": ("/signup",),
+        "dashboard.html": ("/dashboard",),
+        "predictorpage.html": ("/predictor",),
+        "map.html": ("/map",),
+        "mocktest.html": ("/mocktest",),
+        "notifications.html": ("/notifications",),
+        "crashcourse.html": ("/crashcourse",),
+        "analytics.html": ("/analytics",),
+        "comparison.html": ("/comparison",),
+    }
+
+    for file_name, routes in page_routes.items():
+        for route in routes:
+            app.add_url_rule(route, endpoint=f"page_{file_name.replace('.', '_')}_{route.strip('/').replace('/', '_') or 'root'}", view_func=lambda file_name=file_name: _serve_page(file_name))
+
+    @app.get("/html/<path:filename>")
+    def legacy_html_routes(filename: str):
+        if filename in page_routes:
+            preferred = next(iter(page_routes[filename]))
+            return redirect(preferred, code=302)
+        return app.send_static_file(f"html/{filename}")
 
     @app.get("/")
     def serve_index():
