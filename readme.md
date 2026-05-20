@@ -45,6 +45,26 @@ backend/
 3. Run backend:
 	 - `python backend/app.py`
 
+## Windows Startup Without PowerShell Errors
+PowerShell blocks `.ps1` files when the execution policy is set to restrict script running. This is a safety feature that prevents arbitrary scripts from running by default.
+
+Use a temporary bypass for just this session or process instead of changing the machine permanently:
+
+1. Temporary process-only bypass:
+
+	`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+	`.\run_lan_server.ps1`
+
+2. One-line safe launch:
+
+	`powershell -NoProfile -ExecutionPolicy Bypass -File .\run_lan_server.ps1`
+
+3. Easier double-click option:
+
+	Run `run_lan_server.bat`, which launches the same script with a temporary bypass and opens the browser page automatically.
+
+The LAN server should then be available at `http://127.0.0.1:5000/` and on your local network IP at port `5000`.
+
 ## API Testing
 
 ### Predict

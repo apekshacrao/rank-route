@@ -47,7 +47,7 @@ def create_app() -> Flask:
         "predictorpage.html": ("/predictor",),
         "map.html": ("/map",),
         "mocktest.html": ("/mocktest",),
-        "notifications.html": ("/notifications",),
+        "notifications.html": ("/notifications", "/notifications.html"),
         "crashcourse.html": ("/crashcourse",),
         "analytics.html": ("/analytics",),
         "comparison.html": ("/comparison",),

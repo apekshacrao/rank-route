@@ -50,25 +50,10 @@
 				<div class="topbar-right">
 					<button id="themeToggle" class="icon-btn" title="Toggle theme"><i class="bi bi-moon-stars"></i></button>
 
-					<div class="notif-wrap">
-					  <button id="notifBell" class="bell-btn" aria-haspopup="true" aria-expanded="false" title="Notifications">
-						<span class="bell-icon"><i class="bi bi-bell-fill"></i></span>
-						<span class="notif-badge" id="notifBadge" aria-hidden="true">3</span>
-					  </button>
-
-					  <div class="notif-panel shadow-sm" id="notifPanel" aria-hidden="true" role="dialog" aria-label="Notifications panel">
-						<div class="notif-panel-header">
-						  <strong>Notifications</strong>
-						  <div>
-						    <button id="markAllSeen" class="link-muted">Mark all as read</button>
-							<a href="/notifications" class="link-muted ms-2">View all</a>
-						  </div>
-						</div>
-						<ul class="notif-list" id="notifList">
-						  <!-- notifications rendered here -->
-						</ul>
-					  </div>
-					</div>
+					<a id="notifBell" class="bell-btn" href="/notifications" aria-label="Open notifications" title="Notifications">
+					  <span class="bell-icon"><i class="bi bi-bell-fill"></i></span>
+					  <span class="notif-badge" id="notifBadge" aria-hidden="true">0</span>
+					</a>
 				</div>
 			</header>
 

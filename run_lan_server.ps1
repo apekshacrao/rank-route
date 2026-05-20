@@ -19,9 +19,17 @@ if (-not $hostIp) {
     $hostIp = "<LAN_IP_NOT_FOUND>"
 }
 
-Write-Host "Starting RankRoute server for LAN access..." -ForegroundColor Cyan
-Write-Host "Local URL: http://127.0.0.1:5000" -ForegroundColor Green
-Write-Host "LAN URL:   http://$hostIp:5000" -ForegroundColor Green
+$localUrl = "http://127.0.0.1:5000"
+$lanUrl = "http://$hostIp:5000"
+$backendDir = Join-Path $projectRoot "backend"
 
-Set-Location (Join-Path $projectRoot "backend")
-& $pythonExe -m waitress --host=0.0.0.0 --port=5000 app:app
+Write-Host "Starting RankRoute server for LAN access..." -ForegroundColor Cyan
+Write-Host "Local URL: $localUrl" -ForegroundColor Green
+Write-Host "LAN URL:   $lanUrl" -ForegroundColor Green
+
+Start-Process -FilePath $pythonExe `
+    -ArgumentList @("-m", "waitress", "--host=0.0.0.0", "--port=5000", "app:app") `
+    -WorkingDirectory $backendDir `
+    -WindowStyle Hidden
+
+Start-Process $localUrl

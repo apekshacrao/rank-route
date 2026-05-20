@@ -165,6 +165,14 @@ function getFacilityDataForCollege(name) {
 	return facilitiesByCollege[normalized] || null;
 }
 
+function generateSampleContactNumber() {
+	// Generate a random 10-digit phone number for demo
+	const areaCode = String(Math.floor(Math.random() * 900) + 100);
+	const exchange = String(Math.floor(Math.random() * 900) + 100);
+	const line = String(Math.floor(Math.random() * 9000) + 1000);
+	return `${areaCode}${exchange}${line}`;
+}
+
 function renderFacilityGroup(icon, label, items) {
 	if (!Array.isArray(items) || !items.length) {
 		return "";
@@ -172,7 +180,17 @@ function renderFacilityGroup(icon, label, items) {
 
 	const list = items
 		.slice(0, 3)
-		.map((entry) => `<li>${escapeHtml(entry.name || "Unknown")} - ${escapeHtml(entry.distance || "N/A")}</li>`)
+		.map((entry) => {
+			const contactNumber = generateSampleContactNumber();
+			const formattedPhone = `+91${contactNumber.slice(-10)}`;
+			return `<li>
+				<div class="facility-item-info">
+					<span class="facility-name">${escapeHtml(entry.name || "Unknown")}</span>
+					<span class="facility-distance">${escapeHtml(entry.distance || "N/A")}</span>
+				</div>
+				<a href="tel:${formattedPhone}" class="facility-contact-link" title="Call ${escapeHtml(entry.name || 'facility')}">${formattedPhone}</a>
+			</li>`;
+		})
 		.join("");
 
 	return `
@@ -1066,156 +1084,359 @@ function animateCounters() {
 	});
 }
 
-function setupNotifications() {
-	const bell = document.getElementById('notifBell');
-	const badge = document.getElementById('notifBadge');
-	if (!bell) return;
+const NOTIFICATION_STORAGE_KEY = 'rr_notifications_v2';
 
-	// Use the same storage key as notifications page
-	const STORAGE_KEY = 'rr_notifications_v1';
-	const officialCatalog = [
+function getOfficialNotificationCatalog() {
+	return [
 		{
-			key: 'kea-exam-schedule',
-			title: 'KEA Exam Schedule',
-			text: 'Official KEA exam schedule has been released — check the KEA portal for detailed dates and instructions.',
-			type: 'exam',
+			key: 'kcet-counseling-schedule',
+			title: 'KCET Counseling Schedule',
+			category: 'KCET',
+			kind: 'Counseling',
+			text: 'KEA has released the latest KCET counseling schedule, document verification timeline, and reporting instructions.',
 			priority: 'high',
-			offsetMs: 5 * 3600 * 1000,
-			legacyTitles: ['kea psit update'],
+			important: true,
+			offsetMs: 2 * 3600 * 1000,
 		},
 		{
-			key: 'comedk-exam-schedule',
-			title: 'COMEDK Exam Schedule Released',
-			text: 'COMEDK UGET exam dates are announced. Check the official website for application and exam details.',
-			type: 'exam',
+			key: 'kcet-seat-allotment',
+			title: 'KCET Seat Allotment Alert',
+			category: 'KCET',
+			kind: 'Seat Allotment',
+			text: 'Round 1 seat allotment updates are live. Check your allotment status and the official reporting dates.',
 			priority: 'high',
-			offsetMs: 5 * 3600 * 1000,
+			important: true,
+			offsetMs: 7 * 3600 * 1000,
 		},
 		{
-			key: 'pessat-registrations-open',
-			title: 'PESSAT Registrations Open',
-			text: 'PESSAT registration is now open. Apply early to secure your slot.',
-			type: 'exam',
+			key: 'comedk-admission-update',
+			title: 'COMEDK Admission Update',
+			category: 'COMEDK',
+			kind: 'Admission',
+			text: 'COMEDK admission deadlines and option entry instructions have been updated on the official portal.',
 			priority: 'high',
+			important: true,
+			offsetMs: 10 * 3600 * 1000,
+		},
+		{
+			key: 'pessat-updates',
+			title: 'PESSAT Notifications',
+			category: 'PESSAT',
+			kind: 'Exam',
+			text: 'PESSAT application, exam, and slot booking notifications are available for candidates.',
+			priority: 'high',
+			important: false,
+			offsetMs: 16 * 3600 * 1000,
+		},
+		{
+			key: 'rvu-admissions',
+			title: 'RV University Admissions',
+			category: 'Admissions',
+			kind: 'Admission',
+			text: 'RV University admissions have opened for select programs with scholarship and counseling notices.',
+			priority: 'medium',
+			important: false,
 			offsetMs: 24 * 3600 * 1000,
 		},
 		{
-			key: 'rvu-entrance-update',
-			title: 'RVU Entrance Test Update',
-			text: 'RV University entrance exam details updated. Check eligibility and schedule.',
-			type: 'exam',
+			key: 'bms-admissions',
+			title: 'BMS Admissions Notice',
+			category: 'Admissions',
+			kind: 'Admission',
+			text: 'BMS College admission notifications and document verification steps have been published.',
 			priority: 'medium',
-			offsetMs: 2 * 24 * 3600 * 1000,
+			important: false,
+			offsetMs: 30 * 3600 * 1000,
 		},
 		{
-			key: 'reva-cet-notification',
-			title: 'REVA CET Notification',
-			text: 'REVA CET exam schedule released. Visit official portal for details.',
-			type: 'exam',
+			key: 'dsu-entrance-update',
+			title: 'DSU Entrance Exam Update',
+			category: 'DSU',
+			kind: 'Exam',
+			text: 'DSU entrance exam notification, syllabus, and registration timeline are now live.',
 			priority: 'medium',
-			offsetMs: 3 * 24 * 3600 * 1000,
+			important: false,
+			offsetMs: 44 * 3600 * 1000,
 		},
 		{
-			key: 'dsu-entrance-exam-info',
-			title: 'DSU Entrance Exam Info',
-			text: 'DSU entrance exam details available. Check dates and syllabus.',
-			type: 'exam',
+			key: 'mock-test-announcement',
+			title: 'Mock Test Announcement',
+			category: 'Mock Test',
+			kind: 'Practice',
+			text: 'A new official mock test session is ready with timed practice and answer review.',
+			priority: 'low',
+			important: false,
+			offsetMs: 60 * 3600 * 1000,
+		},
+		{
+			key: 'counseling-reminder',
+			title: 'Counseling Schedule Update',
+			category: 'Counseling',
+			kind: 'Counseling',
+			text: 'Keep your documents ready for the next counseling window and fee payment milestone.',
 			priority: 'medium',
-			offsetMs: 4 * 24 * 3600 * 1000,
+			important: false,
+			offsetMs: 18 * 3600 * 1000,
+		},
+		{
+			key: 'comedk-seat-allotment',
+			title: 'COMEDK Seat Allotment Alert',
+			category: 'Seat Allotment',
+			kind: 'Seat Allotment',
+			text: 'COMEDK seat allotment round details are now available for applicants.',
+			priority: 'high',
+			important: true,
+			offsetMs: 20 * 3600 * 1000,
 		},
 	];
+}
+
+function loadNotificationState() {
+	const raw = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
+	const parsed = raw ? JSON.parse(raw) : null;
+	return Array.isArray(parsed) ? parsed : [];
+}
+
+function saveNotificationState(items) {
+	localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(items));
+}
+
+function syncNotificationState() {
 	const now = Date.now();
-	const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-	const source = Array.isArray(stored) ? stored : [];
-	const notifications = officialCatalog.map((item, index) => {
-		const match = source.find((entry) => {
-			const title = String(entry?.title || '').trim().toLowerCase();
-			return title === item.title.toLowerCase() || item.legacyTitles?.includes(title);
-		});
+	const source = loadNotificationState();
+	const catalog = getOfficialNotificationCatalog();
+	const synced = catalog.map((item, index) => {
+		const match = source.find((entry) => String(entry?.key || entry?.title || '').trim().toLowerCase() === item.key.toLowerCase());
 		if (match) {
 			return {
 				...match,
+				key: item.key,
 				title: item.title,
+				category: item.category,
+				kind: item.kind,
 				text: item.text,
-				type: item.type,
 				priority: item.priority,
+				important: Boolean(item.important),
 				read: Boolean(match.read),
 				datetime: match.datetime || new Date(now - item.offsetMs).toISOString(),
 			};
 		}
 		return {
-			id: now + index + 1,
+			id: `notif-${index + 1}`,
+			key: item.key,
 			title: item.title,
+			category: item.category,
+			kind: item.kind,
 			text: item.text,
-			datetime: new Date(now - item.offsetMs).toISOString(),
-			type: item.type,
 			priority: item.priority,
+			important: Boolean(item.important),
 			read: false,
+			datetime: new Date(now - item.offsetMs).toISOString(),
 		};
-	});
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+	}).sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
+	saveNotificationState(synced);
+	return synced;
+}
 
-	function updateBadge() {
-		// Show red badge ONLY if there are unread high-priority notifications
-		const unreadHigh = notifications.filter(n => !n.read && n.priority === 'high').length;
-		if (!badge) return;
-		if (unreadHigh > 0) {
-			badge.textContent = String(unreadHigh);
-			badge.style.display = 'inline-flex';
-		} else {
-			badge.style.display = 'none';
-		}
+function getNotificationRelativeTime(iso) {
+	if (!iso) return '';
+	const elapsed = Math.max(0, Date.now() - new Date(iso).getTime());
+	const minutes = Math.floor(elapsed / 60000);
+	if (minutes < 60) return `${minutes}m ago`;
+	const hours = Math.floor(minutes / 60);
+	if (hours < 24) return `${hours}h ago`;
+	const days = Math.floor(hours / 24);
+	return `${days}d ago`;
+}
+
+function getNotificationFilterItems(notifications) {
+	const categories = Array.from(new Set(notifications.map((item) => item.category).filter(Boolean)));
+	return ['all', 'unread', 'important', ...categories];
+}
+
+function setupNotifications() {
+	const bell = document.getElementById('notifBell');
+	const badge = document.getElementById('notifBadge');
+	const previewList = document.getElementById('notifPreviewList');
+	const listEl = document.getElementById('notificationsList');
+	const filtersEl = document.getElementById('notificationsFilters');
+	const markAllBtn = document.getElementById('markAllNotifications');
+	const unreadCountEl = document.getElementById('notificationsUnreadCount');
+	const unreadHeroEl = document.getElementById('notificationsUnreadHero');
+	const totalCountEl = document.getElementById('notificationsTotalCount');
+	const importantCountEl = document.getElementById('notificationsImportantCount');
+	const emptyEl = document.getElementById('notificationsEmpty');
+	const pageIsActive = Boolean(listEl || filtersEl || markAllBtn || unreadCountEl || totalCountEl);
+	const previewIsActive = Boolean(previewList || badge || bell);
+	if (!pageIsActive && !previewIsActive) return;
+
+	let activeFilter = 'all';
+	let notifications = syncNotificationState();
+
+	function getVisibleNotifications() {
+		if (activeFilter === 'all') return notifications;
+		if (activeFilter === 'unread') return notifications.filter((item) => !item.read);
+		if (activeFilter === 'important') return notifications.filter((item) => item.important);
+		return notifications.filter((item) => item.category === activeFilter);
 	}
 
-	// update badge on load
-	updateBadge();
+	function updateCounts() {
+		const unreadCount = notifications.filter((item) => !item.read).length;
+		const importantCount = notifications.filter((item) => item.important).length;
+		if (badge) {
+			if (unreadCount > 0) {
+				badge.textContent = String(unreadCount);
+				badge.style.display = 'inline-flex';
+			} else {
+				badge.style.display = 'none';
+			}
+		}
+		if (unreadCountEl) unreadCountEl.textContent = String(unreadCount);
+		if (unreadHeroEl) unreadHeroEl.textContent = String(unreadCount);
+		if (totalCountEl) totalCountEl.textContent = String(notifications.length);
+		if (importantCountEl) importantCountEl.textContent = String(importantCount);
+	}
 
-	const panel = document.getElementById('notifPanel');
-	const listEl = document.getElementById('notifList');
-	const markAllBtn = document.getElementById('markAllSeen');
-
-	function renderPanel() {
-		if (!listEl) return;
-		listEl.innerHTML = notifications.map((n) => {
-			const time = new Date(n.datetime).toLocaleString();
+	function renderPreview() {
+		if (!previewList) return;
+		const previewItems = notifications.slice(0, 3);
+		if (!previewItems.length) {
+			previewList.innerHTML = '<div class="notif-preview-empty">No official notifications yet.</div>';
+			return;
+		}
+		previewList.innerHTML = previewItems.map((item) => {
+			const previewClass = item.read ? 'is-read' : 'is-unread';
 			return `
-				<li class="notif-item ${n.read ? '' : 'new'}" data-id="${n.id}">
-					<div>
-						<div class="notif-row-title">${escapeHtml(n.title)}</div>
-						<div class="notif-row-text">${escapeHtml(n.text)}</div>
-						<div class="notif-row-meta">${escapeHtml(time)}</div>
+				<a class="notif-preview-item ${previewClass}" href="/notifications" data-preview-id="${escapeHtml(String(item.id || item.key))}">
+					<div class="notif-preview-main">
+						<div class="notif-preview-topline">
+							<span class="notif-category-pill">${escapeHtml(item.category)}</span>
+							<span class="notif-preview-time">${escapeHtml(getNotificationRelativeTime(item.datetime))}</span>
+						</div>
+						<div class="notif-preview-title">${escapeHtml(item.title)}</div>
+						<div class="notif-preview-text">${escapeHtml(item.text)}</div>
 					</div>
-					<div style="margin-left:8px;flex-shrink:0">
-						${n.priority === 'high' ? '<span class="type-indicator type-exam" title="High priority"></span>' : ''}
-					</div>
-				</li>
+					<span class="notif-status-dot ${item.read ? 'is-read' : 'is-unread'}" aria-hidden="true"></span>
+				</a>
 			`;
 		}).join('');
 	}
 
-	// Toggle the dropdown panel and render content
-	bell.addEventListener('click', (ev) => {
-		if (!panel) return window.location.href = '/notifications';
-		const isOpen = panel.classList.contains('open') || panel.getAttribute('aria-hidden') === 'false';
-		if (isOpen) {
-			panel.classList.remove('open');
-			panel.setAttribute('aria-hidden', 'true');
-		} else {
-			renderPanel();
-			panel.classList.add('open');
-			panel.setAttribute('aria-hidden', 'false');
-		}
-	});
+	function renderFilters() {
+		if (!filtersEl) return;
+		const filterItems = getNotificationFilterItems(notifications);
+		filtersEl.innerHTML = filterItems.map((filter) => {
+			const label = filter === 'all' ? 'All' : filter === 'unread' ? 'Unread' : filter === 'important' ? 'Important' : filter;
+			return `<button class="notification-filter ${activeFilter === filter ? 'active' : ''}" type="button" data-filter="${escapeHtml(filter)}">${escapeHtml(label)}</button>`;
+		}).join('');
+	}
 
-	// mark all as read
-	if (markAllBtn) {
-		markAllBtn.addEventListener('click', () => {
-			notifications.forEach(n => n.read = true);
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
-			updateBadge();
-			renderPanel();
+	function renderPageList() {
+		if (!listEl) return;
+		const visibleNotifications = getVisibleNotifications();
+		if (!visibleNotifications.length) {
+			listEl.innerHTML = '';
+			if (emptyEl) emptyEl.hidden = false;
+			return;
+		}
+		if (emptyEl) emptyEl.hidden = true;
+		listEl.innerHTML = visibleNotifications.map((item) => {
+			const timeLabel = getNotificationRelativeTime(item.datetime);
+			const statusLabel = item.read ? 'Read' : 'Unread';
+			return `
+				<article class="notification-card ${item.read ? '' : 'is-unread'} ${item.important ? 'is-important' : ''}" data-notification-id="${escapeHtml(String(item.id || item.key))}">
+					<div class="notification-card-accent"></div>
+					<div class="notification-card-body">
+						<div class="notification-card-head">
+							<div class="notification-card-meta">
+								<span class="notification-badge category">${escapeHtml(item.category)}</span>
+								<span class="notification-badge kind">${escapeHtml(item.kind)}</span>
+								${item.important ? '<span class="notification-badge important">Important</span>' : ''}
+							</div>
+							<span class="notification-state ${item.read ? 'read' : 'unread'}">${statusLabel}</span>
+						</div>
+						<h3 class="notification-card-title">${escapeHtml(item.title)}</h3>
+						<p class="notification-card-text">${escapeHtml(item.text)}</p>
+						<div class="notification-card-footer">
+							<div class="notification-card-time"><i class="bi bi-clock"></i>${escapeHtml(timeLabel)}</div>
+							<div class="notification-card-actions">
+								<button class="btn btn-sm btn-outline-light mark-single-btn" type="button">${item.read ? 'Seen' : 'Mark as read'}</button>
+							</div>
+						</div>
+					</div>
+				</article>
+			`;
+		}).join('');
+	}
+
+	function rerender() {
+		notifications = syncNotificationState();
+		updateCounts();
+		renderPreview();
+		renderFilters();
+		renderPageList();
+	}
+
+	function setActiveFilter(filter) {
+		activeFilter = filter;
+		renderFilters();
+		renderPageList();
+	}
+
+	function markNotificationRead(identifier) {
+		notifications = notifications.map((item) => {
+			const itemId = String(item.id || item.key);
+			return itemId === String(identifier) ? { ...item, read: true } : item;
+		});
+		saveNotificationState(notifications);
+		renderPreview();
+		updateCounts();
+		renderPageList();
+	}
+
+	function markAllRead() {
+		notifications = notifications.map((item) => ({ ...item, read: true }));
+		saveNotificationState(notifications);
+		renderPreview();
+		updateCounts();
+		renderPageList();
+	}
+
+	if (bell) {
+		bell.addEventListener('click', (event) => {
+			event.preventDefault();
+			window.location.href = '/notifications';
 		});
 	}
+
+	if (filtersEl) {
+		filtersEl.addEventListener('click', (event) => {
+			const button = event.target.closest('[data-filter]');
+			if (!button) return;
+			setActiveFilter(button.dataset.filter || 'all');
+		});
+	}
+
+	if (listEl) {
+		listEl.addEventListener('click', (event) => {
+			const card = event.target.closest('.notification-card');
+			if (!card) return;
+			const identifier = card.dataset.notificationId;
+			const markBtn = event.target.closest('.mark-single-btn');
+			if (markBtn) {
+				event.stopPropagation();
+				markNotificationRead(identifier);
+				return;
+			}
+			markNotificationRead(identifier);
+		});
+	}
+
+	if (markAllBtn) {
+		markAllBtn.addEventListener('click', markAllRead);
+	}
+
+	rerender();
 }
 
 function showToast(message = '', timeout = 2200) {
