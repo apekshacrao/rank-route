@@ -399,8 +399,13 @@ Planned upgrades:
 ---
 ##Project Benefits and Stakeholder Impact:
 
+👨‍🎓 Students:
+
+Can easily report issues without searching for the right department.
+Get transparency through status tracking and resolution updates.
 
 
+------
 # Final Objective
 
 RankRoute aims to become a complete AI-powered student counseling and guidance platform that helps engineering aspirants:
