@@ -395,6 +395,10 @@ Planned upgrades:
 Can easily report issues without searching for the right department.
 Get transparency through status tracking and resolution updates.
 
+* 👨‍💼 College Administration: 
+
+Receives all campus issues in one centralized dashboard.
+Can prioritize and assign issues efficiently instead of relying on emails or verbal complaints.
 
 ------
 # Final Objective
