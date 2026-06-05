@@ -397,6 +397,7 @@ Planned upgrades:
 * Advanced analytics dashboard
 
 ---
+
 # Project Benefits and Stakeholder Impact:
 
 * 👨‍🎓 Students:
