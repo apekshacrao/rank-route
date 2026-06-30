@@ -59,7 +59,7 @@ RankRoute is a Flask-based KCET college predictor with machine learning predicti
 
 ### Internal Project APIs
 
-- `GET /api/health` - service health check
+- `GET /api/health` - service health
 - `POST /predict` - generate college predictions
 - `GET /colleges` - return college catalog data
 - `GET /nearby-facilities` - return supporting facility data
@@ -84,7 +84,7 @@ RankRoute is a Flask-based KCET college predictor with machine learning predicti
 
 ### External APIs And Services
 
-- OpenAI Chat Completions API - used only when `OPENAI_API_KEY` is set and AI mock test generation is enabled
+- OpenAI Chat Completions API - used only when `OPENAI_API_KEY` is set and AI mock test is enabled
 - Google Maps directions URLs - used by the map explorer for navigation; no Google Maps API key is consumed by the code
 - CDN-hosted assets - Bootstrap, Bootstrap Icons, Leaflet, Leaflet marker cluster, Chart.js, and Google Fonts
 
@@ -148,7 +148,7 @@ frontend/
 ```
 
 ## Main Features
-
+RankRoute is an e-learning and career guidance platform designed for PU (Pre-University) students. It provides study materials, mock tests, and personalized learning resources to help students prepare for competitive exams. The platform connects students with colleges, coaching institutes, and educational opportunities through a centralized joining portal. It also offers performance tracking and progress analysis to improve learning outcomes. RankRoute aims to simplify exam preparation and support students in making informed academic and career decisions.
 ### College Prediction
 
 - `POST /predict`
